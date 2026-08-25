@@ -1,0 +1,14 @@
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local development
+node_modules/
+.env
+.env.*
+
+# Build/deployment artifacts
+*.zip
+*.tar.gz
