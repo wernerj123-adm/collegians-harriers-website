@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.8 |
-| Website build phase | Development v0.5.8 |
+| Handbook version | 1.0.9 |
+| Website build phase | Development v0.5.9 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -50,6 +50,8 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | Events | `events.html` | Overview of Collegians-hosted events |
 | Results | `results.html` | Results hub for time trials, championships, hosted events and archives |
 | Result detail | `results/YYYY/YYYY-MM-DD-result-name.html` | Mobile-friendly HTML version of an approved result document |
+| Time-trial results | `time-trial-results.html` | Searchable weekly history with the newest HTML result and archived PDFs |
+| Race and event results | `race-event-results.html` | Searchable race, championship and hosted-event history |
 | Results archive | `results-archive.html` | Searchable historical library organised by season and result type |
 | News | `news.html` | Club announcements, member stories and event updates |
 | Contact | `contact.html` | Club location, contact routes and social channels |
@@ -205,6 +207,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Added a searchable archive with year, result-type and text filters.
 4. Added an archive builder that prevents accidental overwriting and regenerates the archive register from the approved source collection.
 5. Verified that every archived PDF opens, contains at least one page and renders correctly.
+
+### Phase 0.5.9 — Dedicated historical result hubs
+
+1. Connected the Time-trial and Race and event rows on the Results page to dedicated libraries.
+2. Combined the newest weekly HTML result with 174 approved historical time-trial PDFs in one newest-first page.
+3. Grouped 45 road, championship and hosted-event records into a separate searchable page.
+4. Added document, season and latest-result summaries with responsive search and filtering.
+5. Retained the original approved PDFs while allowing new publications to use the mobile-friendly HTML format.
 
 ### Build milestone ledger
 
@@ -448,6 +458,13 @@ The archive is deliberately separate from the current-results register. Current 
 7. Open `results-archive.html` and test text search, season filters, result-type filters and several PDF links before committing.
 8. Commit the archive register, new PDFs and any builder-policy change together.
 
+The same register automatically feeds the public subject pages:
+
+- `time-trial-results.html` shows the `time-trial` records and merges in current publications from `assets/data/results.json`.
+- `race-event-results.html` shows `hosted-event`, `road`, `trail` and `championship` records.
+
+After rebuilding the archive, test both subject pages as well as the complete archive. No manual HTML list needs to be maintained.
+
 The curated rules currently cover Herman's Delight weekly results, Hogsback and Bill Butler hosted events, final club-championship documents and selected road-race results. Update the builder's explicit rules when a new historical series is approved for the archive.
 
 ### 5.5 Update championship standings
@@ -657,7 +674,7 @@ The GitHub repository is the source of truth and provides the version history. P
 
 ## 10. Planned future work
 
-- Populate the Results hub with approved current and historical files.
+- Continue converting newly approved results to mobile-friendly HTML while retaining each source PDF.
 - Add a structured document library where required.
 - Expand dedicated pages for major hosted events.
 - Establish the staging-to-cPanel production deployment process.
@@ -669,6 +686,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.9 — 26 August 2026
+
+- Added the dedicated time-trial and race/event historical result hubs.
+- Documented how current HTML results and approved archive PDFs are combined automatically.
+- Advanced the development build to v0.5.9.
 
 ### 1.0.6 — 26 August 2026
 
