@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.6 |
-| Website build phase | Development v0.5.6 |
+| Handbook version | 1.0.7 |
+| Website build phase | Development v0.5.7 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -49,6 +49,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | Running | `running.html` | Weekly running, time trial, road, trail, championships and resources |
 | Events | `events.html` | Overview of Collegians-hosted events |
 | Results | `results.html` | Results hub for time trials, championships, hosted events and archives |
+| Result detail | `results/YYYY/YYYY-MM-DD-result-name.html` | Mobile-friendly HTML version of an approved result document |
 | News | `news.html` | Club announcements, member stories and event updates |
 | Contact | `contact.html` | Club location, contact routes and social channels |
 | The Longest Day | `longest-day.html` | Dedicated 2026 event page |
@@ -71,11 +72,13 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/home-gallery-v05.css` | Landing-page photo slideshow styling |
 | `assets/css/not-found-v053.css` | Branded page-not-found layout |
 | `assets/css/results-library-v054.css` | Published-results register and filters |
+| `assets/css/result-detail-v057.css` | Responsive tables and summary cards for HTML result pages |
 | `assets/js/site.js` | Mobile navigation behaviour |
 | `assets/js/home-gallery-v05.js` | Slideshow rotation, controls, swipe and reduced-motion behaviour |
 | `assets/js/results-library-v054.js` | Loads, sorts and filters approved result records |
 | `assets/data/results.json` | Versioned public register of approved result files |
 | `assets/results/YYYY/` | Approved result documents organised by year |
+| `results/YYYY/` | Approved HTML result pages organised by year |
 | `results-inbox/` | Local drop folder for approved PDFs awaiting preparation |
 | `Publish Results.cmd` | User-friendly Windows launcher for result publishing |
 | `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
@@ -181,6 +184,13 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 2. Verified all three PDF pages visually before publication.
 3. Added optional title and note overrides for controlled non-interactive publishing.
 4. Clarified the category choices for time trials, road races, trail races, championships and hosted events.
+
+### Phase 0.5.7 — HTML result detail pages
+
+1. Converted the approved 25 August 2026 Herman's Delight PDF into a responsive HTML result page.
+2. Made the HTML page the primary Results-library destination while retaining the original PDF as a secondary link.
+3. Added reusable summary cards and responsive result-table styling for weekly, race and event results.
+4. Extended the results register and publisher to accept an optional HTML page path.
 
 ### Build milestone ledger
 
@@ -340,16 +350,24 @@ Only publish a final, checked result file. Confirm names, categories, times, pos
 4. Review or enter the date, public title, category and optional note.
 5. The publisher validates the PDF, moves it into the correct `assets/results/YYYY/` folder and updates `assets/data/results.json`.
 6. When asked, choose whether to commit and push the prepared result to `develop` immediately.
-7. Wait for GitHub Pages, then open the Results page and verify the new card, filter and PDF link.
+7. Wait for GitHub Pages, then open the Results page and verify the new card, filter and published link.
 8. If publishing is declined, the files remain prepared locally for later review and commit.
 
 The publisher never overwrites an existing public filename. Give a corrected result a new descriptive filename, such as one ending in `-corrected.pdf`.
+
+The PDF is always retained as the approved source. When a readable HTML result page has also been created, pass its repository-relative location to the publisher with `-PagePath`, for example:
+
+```powershell
+.\scripts\publish-results.ps1 -PagePath "results/2026/2026-08-25-hermans-delight-weekly-results.html"
+```
+
+The Results card will then open the HTML page first and show the original PDF as a secondary option. The same arrangement may be used for weekly time trials, race results, championship standings and hosted-event results.
 
 Use **Time trial** for weekly club results, **Road** or **Trail** for ordinary race results, **Championship** for season logs and standings, and **Hosted event** for results from events organised by Collegians.
 
 #### Manual fallback
 
-1. Export the approved result as an accessible PDF. A web table may also be used when the data is short.
+1. Export the approved result as an accessible PDF. Create a responsive HTML detail page when members should be able to read the result directly on the website.
 2. Name the file consistently:
 
 ```text
@@ -370,10 +388,10 @@ assets/results/2026/
 
 4. Open `assets/data/results.json` and set `updated` to the publication date.
 5. Add one record to the `results` list. Use only these category values: `time-trial`, `road`, `trail`, `championship` or `hosted-event`.
-6. Include the title, event date, category, season, file path and format. A short optional note may identify a revision or distance.
+6. Include the title, event date, category, season, PDF file path and format. If an HTML detail page exists, add its repository-relative path as `page`. A short optional note may identify a revision or distance.
 7. If the result belongs to a hosted event, also add a link from that event page.
 8. Open the Results page in the development preview. Confirm that the new record appears in the correct newest-first position and filter.
-9. Open the published file from its generated button and check it on a phone-sized screen.
+9. Open both the HTML result and original PDF from the generated buttons and check the HTML page on a phone-sized screen.
 10. Commit the result file and `results.json` together.
 
 Example register entry:
@@ -384,13 +402,14 @@ Example register entry:
   "date": "2026-08-25",
   "category": "time-trial",
   "season": 2026,
+  "page": "results/2026/2026-08-25-tuesday-time-trial-results.html",
   "file": "assets/results/2026/2026-08-25-tuesday-time-trial-results.pdf",
   "format": "PDF",
   "note": "2.8 km and 5.6 km"
 }
 ```
 
-If a result is corrected later, replace the file, update the displayed revision date, and use a commit description that clearly says it is a corrected result.
+If a result is corrected later, update both the approved PDF and its HTML page, update the displayed revision date, and use a commit description that clearly says it is a corrected result.
 
 ### 5.5 Update championship standings
 

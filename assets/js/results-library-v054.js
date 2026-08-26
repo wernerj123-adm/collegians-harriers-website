@@ -43,13 +43,29 @@
     meta.className = 'result-file-meta';
     meta.textContent = `${formatDate(record.date)} · ${record.season} season${record.note ? ` · ${record.note}` : ''}`;
     copy.append(heading, meta);
+    const actions = document.createElement('div');
+    actions.className = 'result-file-actions';
     const link = document.createElement('a');
-    link.href = record.file;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = `Open ${record.format || 'result'}`;
-    link.setAttribute('aria-label', `Open ${record.title} ${record.format || 'result'}`);
-    article.append(category, copy, link);
+    link.className = 'result-primary';
+    link.href = record.page || record.file;
+    link.textContent = record.page ? 'View results' : `Open ${record.format || 'result'}`;
+    link.setAttribute('aria-label', record.page ? `View ${record.title} as an HTML page` : `Open ${record.title} ${record.format || 'result'}`);
+    if (!record.page) {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
+    actions.append(link);
+    if (record.page && record.file) {
+      const pdfLink = document.createElement('a');
+      pdfLink.className = 'result-secondary';
+      pdfLink.href = record.file;
+      pdfLink.target = '_blank';
+      pdfLink.rel = 'noopener noreferrer';
+      pdfLink.textContent = record.format || 'PDF';
+      pdfLink.setAttribute('aria-label', `Open the original ${record.format || 'PDF'} for ${record.title}`);
+      actions.append(pdfLink);
+    }
+    article.append(category, copy, actions);
     return article;
   };
 

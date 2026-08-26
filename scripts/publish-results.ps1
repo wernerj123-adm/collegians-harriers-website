@@ -5,6 +5,7 @@ param(
     [string]$DefaultCategory = 'time-trial',
     [string]$TitleOverride,
     [string]$NoteOverride,
+    [string]$PagePath,
     [switch]$NonInteractive,
     [switch]$DryRun,
     [switch]$Publish
@@ -87,8 +88,24 @@ if ($pdfFiles.Count -eq 0) {
     Write-Host 'Add approved PDFs to the inbox and run the publisher again.'
     exit 0
 }
-if ($pdfFiles.Count -gt 1 -and (-not [string]::IsNullOrWhiteSpace($TitleOverride) -or -not [string]::IsNullOrWhiteSpace($NoteOverride))) {
-    throw 'TitleOverride and NoteOverride can only be used when the inbox contains one PDF.'
+if ($pdfFiles.Count -gt 1 -and (-not [string]::IsNullOrWhiteSpace($TitleOverride) -or -not [string]::IsNullOrWhiteSpace($NoteOverride) -or -not [string]::IsNullOrWhiteSpace($PagePath))) {
+    throw 'TitleOverride, NoteOverride and PagePath can only be used when the inbox contains one PDF.'
+}
+
+$relativePagePath = ''
+if (-not [string]::IsNullOrWhiteSpace($PagePath)) {
+    $relativePagePath = $PagePath.Trim().Replace('\', '/')
+    if (-not $relativePagePath.EndsWith('.html', [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'PagePath must point to an HTML file.'
+    }
+    $resolvedPagePath = [System.IO.Path]::GetFullPath((Join-Path $repositoryRoot $relativePagePath))
+    $repositoryPrefix = [System.IO.Path]::GetFullPath($repositoryRoot).TrimEnd('\') + '\'
+    if (-not $resolvedPagePath.StartsWith($repositoryPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'PagePath must stay inside the website repository.'
+    }
+    if (-not (Test-Path -LiteralPath $resolvedPagePath -PathType Leaf)) {
+        throw "HTML result page not found: $relativePagePath"
+    }
 }
 
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
@@ -167,6 +184,7 @@ foreach ($pdf in $pdfFiles) {
     Write-Host "  Date:     $dateText"
     Write-Host "  Category: $($categoryLabels[$category])"
     Write-Host "  File:     $relativePath"
+    if ($relativePagePath) { Write-Host "  Web page: $relativePagePath" }
     if ($note) { Write-Host "  Note:     $note" }
 
     if ($DryRun) {
@@ -182,9 +200,10 @@ foreach ($pdf in $pdfFiles) {
         date     = $dateText
         category = $category
         season   = $season
-        file     = $relativePath
-        format   = 'PDF'
     }
+    if ($relativePagePath) { $record['page'] = $relativePagePath }
+    $record['file'] = $relativePath
+    $record['format'] = 'PDF'
     if ($note) { $record['note'] = $note }
     $records += [pscustomobject]$record
     $preparedPaths.Add($relativePath) | Out-Null
@@ -240,6 +259,7 @@ try {
     }
 
     $gitPaths = @('assets/data/results.json') + @($preparedPaths)
+    if ($relativePagePath) { $gitPaths += $relativePagePath }
     & git add -- @gitPaths
     if ($LASTEXITCODE -ne 0) { throw 'Git could not stage the prepared result files.' }
 

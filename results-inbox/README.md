@@ -21,6 +21,8 @@ The publisher moves approved files into the correct year folder and updates `ass
 
 Only PDF files are accepted. The publisher never overwrites an existing published filename.
 
+The approved PDF remains the source document. If an HTML result page is created from it, register that page with the optional `-PagePath` setting. The Results card will open the mobile-friendly HTML page first and retain the PDF as a secondary link. This can be used for weekly time trials, road or trail races, championships and hosted events.
+
 Choose the category that matches the file:
 
 - **Time trial** for weekly Herman's Delight or other club time trials
