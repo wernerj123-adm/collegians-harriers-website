@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.0 |
-| Website build phase | Development v0.5 |
+| Handbook version | 1.0.1 |
+| Website build phase | Development v0.5.1 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -65,6 +65,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/watermark.css` | Subtle crest watermark used across pages |
 | `assets/css/membership-notes.css` | Membership footnote styling |
 | `assets/css/longest-day-v03.css` | The Longest Day page styling |
+| `assets/css/longest-day-flyer-v051.css` | Responsive presentation for the official Longest Day flyer |
 | `assets/css/production-v04.css` | Accessibility and production-browser refinements |
 | `assets/css/home-gallery-v05.css` | Landing-page photo slideshow styling |
 | `assets/js/site.js` | Mobile navigation behaviour |
@@ -126,6 +127,12 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 5. Added accessible captions, alternative text and live slide announcements.
 6. Disabled automatic movement when a visitor has enabled reduced-motion preferences.
 7. Added responsive landscape and portrait presentation rules.
+
+### Phase 0.5.1 — Longest Day event flyer
+
+1. Added the approved full-width 2026 event flyer to The Longest Day page.
+2. Preserved the complete flyer artwork and sponsor treatment without cropping.
+3. Added a full-size viewing link for readability on smaller screens.
 
 ### Build milestone ledger
 
@@ -525,6 +532,11 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.1 — 26 August 2026
+
+- Recorded the addition of the approved 2026 flyer to The Longest Day page.
+- Advanced the development build record to v0.5.1.
 
 ### 1.0.0 — 26 August 2026
 
