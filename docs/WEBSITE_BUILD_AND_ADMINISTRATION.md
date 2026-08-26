@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.4 |
-| Website build phase | Development v0.5.4 |
+| Handbook version | 1.0.5 |
+| Website build phase | Development v0.5.5 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -76,6 +76,9 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/js/results-library-v054.js` | Loads, sorts and filters approved result records |
 | `assets/data/results.json` | Versioned public register of approved result files |
 | `assets/results/YYYY/` | Approved result documents organised by year |
+| `results-inbox/` | Local drop folder for approved PDFs awaiting preparation |
+| `Publish Results.cmd` | User-friendly Windows launcher for result publishing |
+| `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
 
 ### Important external links
 
@@ -163,6 +166,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Added an accessible empty state while no approved files are published.
 4. Created the year-based results directory and filename convention.
 5. Changed the administration process so routine result uploads no longer require editing `results.html`.
+
+### Phase 0.5.5 — Guided results publisher
+
+1. Added a local drop folder for approved PDF results.
+2. Added a Windows launcher and guided PowerShell publisher.
+3. Added PDF, filename, date, category, duplicate and JSON validation.
+4. Added optional Git commit and push to the `develop` preview.
+5. Added safeguards against overwriting published files or including unrelated staged changes.
 
 ### Build milestone ledger
 
@@ -313,6 +324,21 @@ Alternative text should briefly describe what is visible and useful, not repeat 
 ### 5.4 Publish race or time-trial results
 
 Only publish a final, checked result file. Confirm names, categories, times, positions, dates and any corrections before upload.
+
+#### Recommended: guided inbox publisher
+
+1. Name the approved PDF with its date first, for example `2026-08-25-tuesday-time-trial-results.pdf`.
+2. Copy it into `results-inbox/`.
+3. Double-click `Publish Results.cmd` in the main website folder.
+4. Review or enter the date, public title, category and optional note.
+5. The publisher validates the PDF, moves it into the correct `assets/results/YYYY/` folder and updates `assets/data/results.json`.
+6. When asked, choose whether to commit and push the prepared result to `develop` immediately.
+7. Wait for GitHub Pages, then open the Results page and verify the new card, filter and PDF link.
+8. If publishing is declined, the files remain prepared locally for later review and commit.
+
+The publisher never overwrites an existing public filename. Give a corrected result a new descriptive filename, such as one ending in `-corrected.pdf`.
+
+#### Manual fallback
 
 1. Export the approved result as an accessible PDF. A web table may also be used when the data is short.
 2. Name the file consistently:
@@ -576,6 +602,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.5 — 26 August 2026
+
+- Added the guided results-inbox publisher and Windows launcher instructions.
+- Documented automated validation, preparation and optional `develop` publication.
+- Advanced the development build to v0.5.5.
 
 ### 1.0.4 — 26 August 2026
 

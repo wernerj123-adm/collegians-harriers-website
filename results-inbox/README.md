@@ -1,0 +1,22 @@
+# Results inbox
+
+This is the drop folder for approved result PDFs.
+
+## Publish results
+
+1. Confirm that each PDF is final and approved for public release.
+2. Name each file with its date first, for example:
+
+   ```text
+   2026-08-25-tuesday-time-trial-results.pdf
+   ```
+
+3. Copy the PDFs into this `results-inbox` folder.
+4. Double-click `Publish Results.cmd` in the website's main folder.
+5. Review or enter the title, category and optional note for each file.
+6. Choose whether to publish the prepared files to the `develop` preview immediately.
+7. Check the live Results page after GitHub Pages finishes.
+
+The publisher moves approved files into the correct year folder and updates `assets/data/results.json`. PDFs left in this inbox are deliberately ignored by Git so they cannot be published accidentally.
+
+Only PDF files are accepted. The publisher never overwrites an existing published filename.

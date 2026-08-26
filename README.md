@@ -18,3 +18,7 @@ This GitHub repository is the source of truth for the new site. The legacy websi
 The living build record, version-control policy and step-by-step administration instructions are maintained in [docs/WEBSITE_BUILD_AND_ADMINISTRATION.md](docs/WEBSITE_BUILD_AND_ADMINISTRATION.md).
 
 Update the handbook in the same commit whenever a website change alters the site structure or an administration procedure.
+
+## Publishing results
+
+Approved PDF results can be placed in `results-inbox/` and published with `Publish Results.cmd`. The guided publisher files the PDFs by year, updates the public Results register and can optionally commit and push the update to `develop`.
