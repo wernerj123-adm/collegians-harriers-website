@@ -40,8 +40,9 @@ cPanel hosting for collegiansharriers.co.za. Production deployment will only hap
 
 ## Next work
 
-1. Add approved high-resolution transparent crest and favicon assets.
-2. Populate remaining page templates in GitHub.
-3. Build staging deployment workflow.
-4. Refine Home content after visual review.
-5. Expand event, results and document-library components.
+1. Add approved current and historical result files.
+2. Add confirmed weekly running times and route information.
+3. Add confirmed entry and rules links for The Longest Day.
+4. Expand dedicated pages for other hosted events as approved content is supplied.
+5. Build the staging-to-cPanel production deployment workflow.
+6. Expand the document library with approved club resources.

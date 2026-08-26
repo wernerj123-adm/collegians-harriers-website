@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.1 |
-| Website build phase | Development v0.5.1 |
+| Handbook version | 1.0.2 |
+| Website build phase | Development v0.5.2 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -133,6 +133,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 1. Added the approved full-width 2026 event flyer to The Longest Day page.
 2. Preserved the complete flyer artwork and sponsor treatment without cropping.
 3. Added a full-size viewing link for readability on smaller screens.
+
+### Phase 0.5.2 — Production content review
+
+1. Removed internal build-language and outdated “being developed” statements from public pages.
+2. Updated the Events page to reflect that The Longest Day page is complete.
+3. Made the current absence of approved result files explicit without publishing unconfirmed data.
+4. Clarified where members should check for short-notice running updates.
+5. Updated the project roadmap to reflect the actual remaining content and deployment work.
 
 ### Build milestone ledger
 
@@ -532,6 +540,11 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.2 — 26 August 2026
+
+- Recorded the production content review across Running, Events, Results and News.
+- Updated the remaining-work roadmap and advanced the development build to v0.5.2.
 
 ### 1.0.1 — 26 August 2026
 
