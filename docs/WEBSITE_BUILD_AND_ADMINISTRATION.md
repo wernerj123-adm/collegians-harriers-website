@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.5 |
-| Website build phase | Development v0.5.5 |
+| Handbook version | 1.0.6 |
+| Website build phase | Development v0.5.6 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -175,6 +175,13 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Added optional Git commit and push to the `develop` preview.
 5. Added safeguards against overwriting published files or including unrelated staged changes.
 
+### Phase 0.5.6 — First published weekly result
+
+1. Published the approved Herman's Delight weekly results for 25 August 2026.
+2. Verified all three PDF pages visually before publication.
+3. Added optional title and note overrides for controlled non-interactive publishing.
+4. Clarified the category choices for time trials, road races, trail races, championships and hosted events.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -337,6 +344,8 @@ Only publish a final, checked result file. Confirm names, categories, times, pos
 8. If publishing is declined, the files remain prepared locally for later review and commit.
 
 The publisher never overwrites an existing public filename. Give a corrected result a new descriptive filename, such as one ending in `-corrected.pdf`.
+
+Use **Time trial** for weekly club results, **Road** or **Trail** for ordinary race results, **Championship** for season logs and standings, and **Hosted event** for results from events organised by Collegians.
 
 #### Manual fallback
 
@@ -602,6 +611,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.6 — 26 August 2026
+
+- Recorded the first approved weekly result published through the register.
+- Added clear category guidance for race and event result files.
+- Documented controlled title and note overrides and advanced the development build to v0.5.6.
 
 ### 1.0.5 — 26 August 2026
 

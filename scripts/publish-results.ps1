@@ -3,6 +3,8 @@ param(
     [string]$InboxPath,
     [ValidateSet('time-trial', 'road', 'trail', 'championship', 'hosted-event')]
     [string]$DefaultCategory = 'time-trial',
+    [string]$TitleOverride,
+    [string]$NoteOverride,
     [switch]$NonInteractive,
     [switch]$DryRun,
     [switch]$Publish
@@ -85,6 +87,9 @@ if ($pdfFiles.Count -eq 0) {
     Write-Host 'Add approved PDFs to the inbox and run the publisher again.'
     exit 0
 }
+if ($pdfFiles.Count -gt 1 -and (-not [string]::IsNullOrWhiteSpace($TitleOverride) -or -not [string]::IsNullOrWhiteSpace($NoteOverride))) {
+    throw 'TitleOverride and NoteOverride can only be used when the inbox contains one PDF.'
+}
 
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 $records = @($manifest.results)
@@ -116,9 +121,9 @@ foreach ($pdf in $pdfFiles) {
     }
 
     $defaultTitle = Get-DefaultTitle -BaseName $pdf.BaseName
-    $title = if ($NonInteractive) { $defaultTitle } else { Read-WithDefault -Prompt 'Public result title' -Default $defaultTitle }
+    $title = if (-not [string]::IsNullOrWhiteSpace($TitleOverride)) { $TitleOverride.Trim() } elseif ($NonInteractive) { $defaultTitle } else { Read-WithDefault -Prompt 'Public result title' -Default $defaultTitle }
     $category = $DefaultCategory
-    $note = ''
+    $note = if ([string]::IsNullOrWhiteSpace($NoteOverride)) { '' } else { $NoteOverride.Trim() }
 
     if (-not $NonInteractive) {
         Write-Host 'Choose a category:'
@@ -134,7 +139,9 @@ foreach ($pdf in $pdfFiles) {
             if (-not $validChoice) { Write-Host 'Enter one of the category numbers shown above.' -ForegroundColor Yellow }
         } until ($validChoice)
         $category = $categoryKeys[$choiceNumber - 1]
-        $note = (Read-Host 'Optional note, distance or revision (press Enter to skip)').Trim()
+        if ([string]::IsNullOrWhiteSpace($NoteOverride)) {
+            $note = (Read-Host 'Optional note, distance or revision (press Enter to skip)').Trim()
+        }
     }
 
     $season = $parsedDate.Year

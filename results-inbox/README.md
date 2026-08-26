@@ -20,3 +20,11 @@ This is the drop folder for approved result PDFs.
 The publisher moves approved files into the correct year folder and updates `assets/data/results.json`. PDFs left in this inbox are deliberately ignored by Git so they cannot be published accidentally.
 
 Only PDF files are accepted. The publisher never overwrites an existing published filename.
+
+Choose the category that matches the file:
+
+- **Time trial** for weekly Herman's Delight or other club time trials
+- **Road** for road-race results
+- **Trail** for trail-race results
+- **Championship** for club championship logs or standings
+- **Hosted event** for results from a Collegians-hosted event
