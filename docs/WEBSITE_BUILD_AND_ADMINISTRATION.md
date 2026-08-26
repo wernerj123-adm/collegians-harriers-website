@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.3 |
-| Website build phase | Development v0.5.3 |
+| Handbook version | 1.0.4 |
+| Website build phase | Development v0.5.4 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -70,8 +70,12 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/production-v04.css` | Accessibility and production-browser refinements |
 | `assets/css/home-gallery-v05.css` | Landing-page photo slideshow styling |
 | `assets/css/not-found-v053.css` | Branded page-not-found layout |
+| `assets/css/results-library-v054.css` | Published-results register and filters |
 | `assets/js/site.js` | Mobile navigation behaviour |
 | `assets/js/home-gallery-v05.js` | Slideshow rotation, controls, swipe and reduced-motion behaviour |
+| `assets/js/results-library-v054.js` | Loads, sorts and filters approved result records |
+| `assets/data/results.json` | Versioned public register of approved result files |
+| `assets/results/YYYY/` | Approved result documents organised by year |
 
 ### Important external links
 
@@ -151,6 +155,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Added explicit crest image dimensions consistently across site pages.
 4. Removed the remaining internal build-language from the About page.
 5. Added a repeatable broken-link check to the administration workflow.
+
+### Phase 0.5.4 — Results publishing foundation
+
+1. Added a versioned JSON register for approved result files.
+2. Added automatic newest-first sorting and category filters.
+3. Added an accessible empty state while no approved files are published.
+4. Created the year-based results directory and filename convention.
+5. Changed the administration process so routine result uploads no longer require editing `results.html`.
 
 ### Build milestone ledger
 
@@ -321,21 +333,26 @@ Example:
 assets/results/2026/
 ```
 
-4. Open `results.html`.
-5. Add the newest result at the top of the appropriate section so current results appear before the archive.
-6. Include the date, event name, result type and file format in the link text.
+4. Open `assets/data/results.json` and set `updated` to the publication date.
+5. Add one record to the `results` list. Use only these category values: `time-trial`, `road`, `trail`, `championship` or `hosted-event`.
+6. Include the title, event date, category, season, file path and format. A short optional note may identify a revision or distance.
 7. If the result belongs to a hosted event, also add a link from that event page.
-8. Open the file from the development preview and confirm that it downloads or displays correctly.
-9. Check the PDF on a phone-sized screen.
-10. Commit the HTML and result file together.
+8. Open the Results page in the development preview. Confirm that the new record appears in the correct newest-first position and filter.
+9. Open the published file from its generated button and check it on a phone-sized screen.
+10. Commit the result file and `results.json` together.
 
-Suggested link wording:
+Example register entry:
 
-```html
-<a class="download" href="assets/results/2026/2026-08-25-tuesday-time-trial-results.pdf">
-  <strong>Tuesday Time Trial — 25 August 2026</strong>
-  <span>PDF results</span>
-</a>
+```json
+{
+  "title": "Tuesday Time Trial — 25 August 2026",
+  "date": "2026-08-25",
+  "category": "time-trial",
+  "season": 2026,
+  "file": "assets/results/2026/2026-08-25-tuesday-time-trial-results.pdf",
+  "format": "PDF",
+  "note": "2.8 km and 5.6 km"
+}
 ```
 
 If a result is corrected later, replace the file, update the displayed revision date, and use a commit description that clearly says it is a corrected result.
@@ -559,6 +576,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.4 — 26 August 2026
+
+- Added the data-driven results publishing procedure and register schema.
+- Recorded the results library, year folders, automatic sorting and filters.
+- Advanced the development build to v0.5.4.
 
 ### 1.0.3 — 26 August 2026
 

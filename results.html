@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="assets/css/crest-fix.css?v=20260825d">
 <link rel="stylesheet" href="assets/css/pages-v02.css?v=20260825d">
 <link rel="stylesheet" href="assets/css/pages-v03.css?v=20260826a">
+<link rel="stylesheet" href="assets/css/results-library-v054.css?v=20260826a">
 <link rel="stylesheet" href="assets/css/watermark.css?v=20260826a">
 <meta name="theme-color" content="#d71920">
 <link rel="icon" type="image/png" href="assets/img/collegians-logo.png?v=20260825d">
@@ -80,6 +81,20 @@
 <strong>Hosted races and endurance events</strong>
 </aside>
 </div>
+<section class="results-library" data-results-library data-source="assets/data/results.json" aria-labelledby="current-results-title">
+<div class="results-library-head">
+<div>
+<span class="section-kicker">PUBLISHED FILES</span>
+<h2 id="current-results-title">Current results.</h2>
+</div>
+<p data-results-updated>Checking for approved result files…</p>
+</div>
+<div class="results-filters" data-results-filters aria-label="Filter published results" hidden></div>
+<div class="results-list" data-results-list aria-live="polite" aria-busy="true">
+<div class="results-loading">Loading the results register…</div>
+</div>
+<noscript><p class="results-empty">JavaScript is required to display the results register. Please use the Contact page if you need a specific result.</p></noscript>
+</section>
 <div class="section-title">
 <h2>Find your results.</h2>
 <p>A clear structure for the result sets members use throughout the year.</p>
@@ -191,6 +206,8 @@
 </div>
 </footer>
 <script src="assets/js/site.js">
+</script>
+<script src="assets/js/results-library-v054.js?v=20260826a">
 </script>
 </body>
 </html>
