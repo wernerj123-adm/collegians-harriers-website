@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.7 |
-| Website build phase | Development v0.5.7 |
+| Handbook version | 1.0.8 |
+| Website build phase | Development v0.5.8 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -50,6 +50,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | Events | `events.html` | Overview of Collegians-hosted events |
 | Results | `results.html` | Results hub for time trials, championships, hosted events and archives |
 | Result detail | `results/YYYY/YYYY-MM-DD-result-name.html` | Mobile-friendly HTML version of an approved result document |
+| Results archive | `results-archive.html` | Searchable historical library organised by season and result type |
 | News | `news.html` | Club announcements, member stories and event updates |
 | Contact | `contact.html` | Club location, contact routes and social channels |
 | The Longest Day | `longest-day.html` | Dedicated 2026 event page |
@@ -73,15 +74,20 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/not-found-v053.css` | Branded page-not-found layout |
 | `assets/css/results-library-v054.css` | Published-results register and filters |
 | `assets/css/result-detail-v057.css` | Responsive tables and summary cards for HTML result pages |
+| `assets/css/results-archive-v058.css` | Searchable archive layout, filters and historical result rows |
 | `assets/js/site.js` | Mobile navigation behaviour |
 | `assets/js/home-gallery-v05.js` | Slideshow rotation, controls, swipe and reduced-motion behaviour |
 | `assets/js/results-library-v054.js` | Loads, sorts and filters approved result records |
+| `assets/js/results-archive-v058.js` | Loads and filters the historical archive register |
 | `assets/data/results.json` | Versioned public register of approved result files |
+| `assets/data/results-archive.json` | Generated register of approved historical result files |
 | `assets/results/YYYY/` | Approved result documents organised by year |
+| `assets/results/archive/YYYY/` | Curated historical PDFs organised by season and result type |
 | `results/YYYY/` | Approved HTML result pages organised by year |
 | `results-inbox/` | Local drop folder for approved PDFs awaiting preparation |
 | `Publish Results.cmd` | User-friendly Windows launcher for result publishing |
 | `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
+| `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
 
 ### Important external links
 
@@ -191,6 +197,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 2. Made the HTML page the primary Results-library destination while retaining the original PDF as a secondary link.
 3. Added reusable summary cards and responsive result-table styling for weekly, race and event results.
 4. Extended the results register and publisher to accept an optional HTML page path.
+
+### Phase 0.5.8 — Historical results archive
+
+1. Audited the club Results library and separated public results from drafts, templates, signed forms and administrative documents.
+2. Preserved 219 approved PDFs spanning the available 1997–2026 history.
+3. Added a searchable archive with year, result-type and text filters.
+4. Added an archive builder that prevents accidental overwriting and regenerates the archive register from the approved source collection.
+5. Verified that every archived PDF opens, contains at least one page and renders correctly.
 
 ### Build milestone ledger
 
@@ -410,6 +424,31 @@ Example register entry:
 ```
 
 If a result is corrected later, update both the approved PDF and its HTML page, update the displayed revision date, and use a commit description that clearly says it is a corrected result.
+
+#### Maintain the historical archive
+
+The archive is deliberately separate from the current-results register. Current publications continue to use `assets/data/results.json`; the historical library uses `assets/data/results-archive.json`.
+
+1. Keep the club's master result PDFs in the OneDrive `Collegians\Results` structure.
+2. Confirm that each document is intended for public use. Do not include blank templates, witness sheets, drafts, signed forms, entry registers or administration documents.
+3. From the website folder, run:
+
+```powershell
+.\scripts\build-results-archive.ps1
+```
+
+4. If the master Results folder is somewhere else, provide it explicitly:
+
+```powershell
+.\scripts\build-results-archive.ps1 -SourceRoot "D:\Club\Results"
+```
+
+5. The builder adds approved documents under `assets/results/archive/YYYY/` and regenerates `assets/data/results-archive.json`.
+6. It never replaces a published archive file with different content. If a correction is required, publish a clearly named revised document so the change remains visible in version control.
+7. Open `results-archive.html` and test text search, season filters, result-type filters and several PDF links before committing.
+8. Commit the archive register, new PDFs and any builder-policy change together.
+
+The curated rules currently cover Herman's Delight weekly results, Hogsback and Bill Butler hosted events, final club-championship documents and selected road-race results. Update the builder's explicit rules when a new historical series is approved for the archive.
 
 ### 5.5 Update championship standings
 
