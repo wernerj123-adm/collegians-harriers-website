@@ -3,8 +3,9 @@
 .brand{gap:18px;min-width:365px}
 .crest-shell{width:82px!important;height:94px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 82px!important;overflow:visible!important}
 .crest-shell img{display:block!important;width:auto!important;height:90px!important;max-width:82px!important;object-fit:contain!important;object-position:center!important;opacity:1!important;visibility:visible!important}
-.brand-copy strong{font-size:1.03rem}
+.brand-copy strong{font-size:1.7rem;line-height:1.05;letter-spacing:.11em}
 .footer-crest{width:92px!important;height:112px!important}
 .footer-crest img{display:block!important;width:auto!important;height:108px!important;max-width:92px!important;object-fit:contain!important;opacity:1!important;visibility:visible!important}
-@media(max-width:1050px){.brand{min-width:auto}.crest-shell{width:68px!important;height:80px!important;flex-basis:68px!important}.crest-shell img{height:76px!important;max-width:68px!important}}
-@media(max-width:760px){.site-header .nav{min-height:88px}.crest-shell{width:56px!important;height:68px!important;flex-basis:56px!important}.crest-shell img{height:64px!important;max-width:56px!important}.brand{gap:10px}}
+@media(max-width:1050px){.brand{min-width:auto}.brand-copy strong{font-size:1.75rem}.crest-shell{width:68px!important;height:80px!important;flex-basis:68px!important}.crest-shell img{height:76px!important;max-width:68px!important}}
+@media(max-width:760px){.site-header .nav{min-height:88px}.brand-copy strong{font-size:1.35rem;letter-spacing:.09em}.crest-shell{width:56px!important;height:68px!important;flex-basis:56px!important}.crest-shell img{height:64px!important;max-width:56px!important}.brand{gap:10px}}
+@media(max-width:480px){.brand-copy strong{font-size:1.05rem;letter-spacing:.07em}}
