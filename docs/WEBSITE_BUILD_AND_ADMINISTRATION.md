@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.2 |
-| Website build phase | Development v0.5.2 |
+| Handbook version | 1.0.3 |
+| Website build phase | Development v0.5.3 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -52,6 +52,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | News | `news.html` | Club announcements, member stories and event updates |
 | Contact | `contact.html` | Club location, contact routes and social channels |
 | The Longest Day | `longest-day.html` | Dedicated 2026 event page |
+| Page not found | `404.html` | Branded recovery page for old, moved or mistyped links |
 
 ### Shared assets
 
@@ -68,6 +69,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/longest-day-flyer-v051.css` | Responsive presentation for the official Longest Day flyer |
 | `assets/css/production-v04.css` | Accessibility and production-browser refinements |
 | `assets/css/home-gallery-v05.css` | Landing-page photo slideshow styling |
+| `assets/css/not-found-v053.css` | Branded page-not-found layout |
 | `assets/js/site.js` | Mobile navigation behaviour |
 | `assets/js/home-gallery-v05.js` | Slideshow rotation, controls, swipe and reduced-motion behaviour |
 
@@ -141,6 +143,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Made the current absence of approved result files explicit without publishing unconfirmed data.
 4. Clarified where members should check for short-notice running updates.
 5. Updated the project roadmap to reflect the actual remaining content and deployment work.
+
+### Phase 0.5.3 — Link recovery and site consistency
+
+1. Added a branded 404 page with routes back to Home, Membership, Running, Events and Results.
+2. Replaced obsolete public redesign-version labels with the club's founding year and location.
+3. Added explicit crest image dimensions consistently across site pages.
+4. Removed the remaining internal build-language from the About page.
+5. Added a repeatable broken-link check to the administration workflow.
 
 ### Build milestone ledger
 
@@ -432,6 +442,15 @@ assets/css/example.css?v=20260826b
 6. Test with reduced motion where animation is involved.
 7. Check that existing pages have not changed unexpectedly.
 
+### 5.12 Check broken links and the 404 page
+
+1. Check every internal link after adding, renaming or removing a page or document.
+2. Confirm that each local link points to a file that exists in the repository.
+3. Open a deliberately incorrect development-preview address and confirm that `404.html` appears.
+4. Test the Home, Membership, Running, Events and Results recovery links.
+5. The current 404 page uses the GitHub Pages project base `/collegians-harriers-website/`. Change its `<base>` value to `/` when deploying at the root of the production domain.
+6. Do not redirect every missing address automatically; visitors should be told that the requested page was not found.
+
 ---
 
 ## 6. Pre-publication checklist
@@ -540,6 +559,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.0.3 — 26 August 2026
+
+- Added the custom 404 recovery page and its administration procedure.
+- Recorded the site-wide footer and crest-dimension consistency pass.
+- Advanced the development build to v0.5.3.
 
 ### 1.0.2 — 26 August 2026
 

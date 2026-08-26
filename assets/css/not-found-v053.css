@@ -1,0 +1,114 @@
+/* Custom GitHub Pages recovery page. */
+.not-found-main {
+  min-height: 68vh;
+  background: var(--black);
+  color: #fff;
+}
+
+.not-found-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 105px 0;
+}
+
+.not-found-hero::before {
+  content: "404";
+  position: absolute;
+  right: -0.08em;
+  bottom: -0.34em;
+  color: rgba(255, 255, 255, 0.035);
+  font-size: clamp(17rem, 42vw, 38rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.not-found-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+  gap: 80px;
+  align-items: center;
+}
+
+.not-found-code {
+  margin: 24px 0 -14px;
+  color: var(--red);
+  font-size: clamp(4.5rem, 10vw, 8.5rem);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.not-found-copy h1 {
+  margin: 0 0 28px;
+  font-size: clamp(3.2rem, 7vw, 6.6rem);
+  line-height: 0.88;
+  letter-spacing: -0.06em;
+}
+
+.not-found-copy h1 span {
+  color: var(--red);
+}
+
+.not-found-copy > p:not(.not-found-code) {
+  max-width: 650px;
+  color: #c4c4c4;
+  font-size: 1.08rem;
+}
+
+.not-found-copy .btn {
+  margin-top: 18px;
+}
+
+.route-card {
+  padding: 30px;
+  border: 1px solid #343438;
+  border-top: 6px solid var(--red);
+  border-radius: var(--radius);
+  background: rgba(21, 21, 23, 0.92);
+}
+
+.route-card > span {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--red);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.route-card a {
+  display: block;
+  padding: 15px 0;
+  border-top: 1px solid #343438;
+}
+
+.route-card a:hover strong {
+  color: var(--red);
+}
+
+.route-card strong,
+.route-card small {
+  display: block;
+}
+
+.route-card small {
+  margin-top: 2px;
+  color: #999;
+}
+
+@media (max-width: 760px) {
+  .not-found-hero {
+    padding: 75px 0;
+  }
+
+  .not-found-grid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+
+  .not-found-code {
+    font-size: 5rem;
+  }
+}
