@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.3 |
-| Website build phase | Development v0.6.2 |
+| Handbook version | 1.1.4 |
+| Website build phase | Development v0.6.3 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -246,6 +246,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Individual mode retains the full per-file questions for titles, notes, alternative text and captions.
 4. Verified both shared and individual multi-file preparation flows in isolated test repositories.
 
+### Phase 0.6.3 — Event photo albums
+
+1. Changed the photo archive from individual archive cards to event/day album cards.
+2. Added a dedicated album view that displays all photographs belonging to the selected event.
+3. Added album names and stable album identifiers to the photo register.
+4. Updated the photo publisher to store files in `assets/img/gallery/YYYY/album-name/`.
+5. Grouped the existing Spar Ladies photographs into the `Spar Ladies 2026` album and folder.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -367,7 +375,7 @@ Paste that address into the File Explorer address bar to open the folder. If the
 | Photo inbox | `photo-inbox\` | Place approved JPG, JPEG or PNG files here before running the launcher |
 | Photo publishing script | `scripts\publish-photos.ps1` | Advanced PowerShell version used by the launcher |
 | Photo register | `assets\data\photos.json` | Controls the latest activity and searchable photo archive |
-| Published photographs | `assets\img\gallery\YYYY\` | Photographs filed automatically by year |
+| Published photographs | `assets\img\gallery\YYYY\album-name\` | Photographs filed automatically by year and album/event |
 | Administration handbook | `docs\WEBSITE_BUILD_AND_ADMINISTRATION.md` | This build record and operating manual |
 
 The relevant online locations are:
@@ -395,9 +403,10 @@ The relevant online locations are:
 1. Confirm publication permission and copy the approved JPG, JPEG or PNG files into `photo-inbox\`.
 2. Return to the main website folder and double-click `Publish Photos.cmd`.
 3. If several photographs are present, choose shared weekly information or individual information for every image.
-4. Review the date, public title, activity type, alternative text and caption.
-5. Answer **Yes** when asked whether to publish to `develop`.
-6. Wait for GitHub Pages and verify the newest group and archive entries on Club Photos.
+4. Enter the same album/event name for photographs from the same day or event, for example `Spar Ladies 2026`.
+5. Review the date, public title, activity type, alternative text and caption.
+6. Answer **Yes** when asked whether to publish to `develop`.
+7. Wait for GitHub Pages and open the album from Club Photos to verify every image.
 
 Files sitting in an inbox are local and are not part of the public website. Once a file is committed and pushed to this public repository, it is publicly accessible. Check results for unnecessary personal information and confirm photograph permissions before answering **Yes** to publication.
 
@@ -459,10 +468,11 @@ The Home slideshow is a small curated feature. Routine weekly activity photograp
 3. Copy the approved JPG, JPEG or PNG files into `photo-inbox/`.
 4. Double-click `Publish Photos.cmd` in the main website folder.
 5. If more than one file is present, choose **shared weekly information** or **individual information**.
-6. Shared mode asks for the date and activity once, then creates titles and captions from the filenames. Individual mode asks for all information for every photograph.
-7. The publisher validates the image, calculates its Monday week date, moves it into `assets/img/gallery/YYYY/` and updates `assets/data/photos.json`.
-8. When asked, choose whether to commit and push the prepared photographs to `develop` immediately.
-9. Wait for GitHub Pages, then open `photos.html` and check the newest highlights, search, filters and full-size images.
+6. Shared mode asks for the date, activity and album/event name once, then creates titles and captions from the filenames. Individual mode asks for all information for every photograph.
+7. Use exactly the same album name for all files that belong together. `Spar Ladies 2026`, for example, becomes the folder `assets/img/gallery/2026/spar-ladies-2026/` and one clickable album on the website.
+8. The publisher validates the image, calculates its Monday week date, moves it into `assets/img/gallery/YYYY/album-name/` and updates `assets/data/photos.json`.
+9. When asked, choose whether to commit and push the prepared photographs to `develop` immediately.
+10. Wait for GitHub Pages, then open `photos.html`, select the new album and check every full-size image.
 
 Photographs from the same Monday-to-Sunday week are kept together in the latest-activity area. The publisher never overwrites an existing public filename. Give a revised or alternate photograph a different public title.
 
@@ -470,17 +480,19 @@ The guided publisher offers these consistent activity types: **Time trial**, **T
 
 #### Manual fallback
 
-1. Create the year folder if needed and place the optimised image in `assets/img/gallery/YYYY/`.
+1. Create the year and album folders if needed and place the optimised image in `assets/img/gallery/YYYY/album-name/`.
 2. Open `assets/data/photos.json` and add one object inside the `photos` array:
 
 ```json
 {
   "title": "Tuesday time trial",
+  "album": "Tuesday Time Trial - 1 September 2026",
+  "albumSlug": "tuesday-time-trial-1-september-2026",
   "date": "2026-09-01",
   "week": "2026-08-31",
   "year": 2026,
   "activity": "Time trial",
-  "image": "assets/img/gallery/2026/tuesday-time-trial-2026-09-01.jpg",
+  "image": "assets/img/gallery/2026/tuesday-time-trial-1-september-2026/2026-09-01-tuesday-time-trial.jpg",
   "alt": "Collegians runners starting the Tuesday time trial",
   "caption": "Members heading out for the weekly club time trial."
 }
@@ -818,6 +830,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.4 — 27 August 2026
+
+- Added event/day albums, album URLs and physical year/album folders.
+- Documented how matching album names group future photographs together.
+- Recorded the migration of the Spar Ladies photographs and advanced the build to v0.6.3.
 
 ### 1.1.3 — 27 August 2026
 

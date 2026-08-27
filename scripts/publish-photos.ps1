@@ -5,6 +5,7 @@ param(
     [string]$DefaultActivity = 'club-gathering',
     [string]$DateOverride,
     [string]$TitleOverride,
+    [string]$AlbumOverride,
     [string]$AltOverride,
     [string]$CaptionOverride,
     [switch]$NonInteractive,
@@ -138,6 +139,7 @@ $preparedCount = 0
 $useSharedInfo = $false
 $sharedDateText = ''
 $sharedActivityKey = $DefaultActivity
+$sharedAlbumTitle = ''
 
 if (-not $NonInteractive -and $photoFiles.Count -gt 1) {
     Write-Host ''
@@ -161,6 +163,8 @@ if (-not $NonInteractive -and $photoFiles.Count -gt 1) {
             if (-not $validSharedDate) { Write-Host 'Enter a valid date in YYYY-MM-DD format.' -ForegroundColor Yellow }
         } until ($validSharedDate)
         $sharedActivityKey = Read-ActivityChoice -DefaultKey $DefaultActivity
+        $defaultAlbumTitle = if (-not [string]::IsNullOrWhiteSpace($AlbumOverride)) { $AlbumOverride.Trim() } else { Get-DefaultTitle -BaseName $photoFiles[0].BaseName }
+        $sharedAlbumTitle = Read-WithDefault -Prompt 'Shared album/event name' -Default $defaultAlbumTitle
         Write-Host 'Titles and captions will be generated from filenames. Use descriptive filenames for shared mode.' -ForegroundColor DarkGray
     }
 }
@@ -201,6 +205,10 @@ foreach ($photo in $photoFiles) {
         $activityKey = Read-ActivityChoice -DefaultKey $DefaultActivity
     }
 
+    $defaultAlbumTitle = if (-not [string]::IsNullOrWhiteSpace($AlbumOverride)) { $AlbumOverride.Trim() } else { $title }
+    $albumTitle = if ($useSharedInfo) { $sharedAlbumTitle } elseif ($NonInteractive) { $defaultAlbumTitle } else { Read-WithDefault -Prompt 'Album/event name' -Default $defaultAlbumTitle }
+    $albumSlug = Get-Slug -Value $albumTitle
+
     $defaultAlt = if ($useSharedInfo) { "$title - Collegians Harriers $($activityLabels[$activityKey].ToLowerInvariant())" } else { "Collegians Harriers $($activityLabels[$activityKey].ToLowerInvariant()) activity" }
     $alt = if (-not [string]::IsNullOrWhiteSpace($AltOverride)) { $AltOverride.Trim() } elseif ($NonInteractive -or $useSharedInfo) { $defaultAlt } else { Read-WithDefault -Prompt 'Alternative text describing what is visible' -Default $defaultAlt }
     $defaultCaption = $title
@@ -209,9 +217,9 @@ foreach ($photo in $photoFiles) {
     $year = $parsedDate.Year
     $extension = $photo.Extension.ToLowerInvariant()
     $safeName = "$dateText-$(Get-Slug -Value $title)$extension"
-    $yearDirectory = Join-Path $repositoryRoot "assets\img\gallery\$year"
-    $destinationPath = Join-Path $yearDirectory $safeName
-    $relativePath = "assets/img/gallery/$year/$safeName"
+    $albumDirectory = Join-Path $repositoryRoot "assets\img\gallery\$year\$albumSlug"
+    $destinationPath = Join-Path $albumDirectory $safeName
+    $relativePath = "assets/img/gallery/$year/$albumSlug/$safeName"
 
     if (Test-Path -LiteralPath $destinationPath) {
         Write-Warning "$relativePath already exists. Nothing was overwritten."
@@ -225,6 +233,7 @@ foreach ($photo in $photoFiles) {
     Write-Host "  Title:    $title"
     Write-Host "  Date:     $dateText"
     Write-Host "  Activity: $($activityLabels[$activityKey])"
+    Write-Host "  Album:    $albumTitle"
     Write-Host "  Image:    $relativePath"
     Write-Host "  Alt text: $alt"
     Write-Host "  Caption:  $caption"
@@ -235,10 +244,12 @@ foreach ($photo in $photoFiles) {
         continue
     }
 
-    [System.IO.Directory]::CreateDirectory($yearDirectory) | Out-Null
+    [System.IO.Directory]::CreateDirectory($albumDirectory) | Out-Null
     Move-Item -LiteralPath $photo.FullName -Destination $destinationPath
     $records += [pscustomobject][ordered]@{
         title    = $title
+        album    = $albumTitle
+        albumSlug = $albumSlug
         date     = $dateText
         week     = Get-WeekStart -Date $parsedDate
         year     = $year
