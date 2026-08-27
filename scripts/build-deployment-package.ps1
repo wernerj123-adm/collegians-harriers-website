@@ -107,6 +107,7 @@ function Test-PackageLinks {
         $baseHref = if ($baseMatch.Success) { $baseMatch.Groups['url'].Value } else { '' }
         foreach ($match in [regex]::Matches($content, $attributePattern)) {
             $reference = $match.Groups['url'].Value
+            if ($baseMatch.Success -and $reference -eq $baseHref) { continue }
             $target = Resolve-PackageReference -Reference $reference -DocumentDirectory $document.DirectoryName -SiteRoot $SiteRoot -BaseHref $baseHref
             if (-not $target) { continue }
             if (-not $target.StartsWith($sitePrefix, [System.StringComparison]::OrdinalIgnoreCase) -and $target.TrimEnd('\') -ne $SiteRoot.TrimEnd('\')) {
