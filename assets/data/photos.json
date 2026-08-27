@@ -1,27 +1,47 @@
 {
-  "updated": "2026-08-26",
-  "photos": [
-    {
-      "title": "Together on the road",
-      "date": "2026-08-26",
-      "week": "2026-08-24",
-      "dateLabel": "Recent club activity",
-      "year": 2026,
-      "activity": "Race day",
-      "image": "assets/img/collegians-runners-race.png",
-      "alt": "Collegians Harriers runners racing together in club colours",
-      "caption": "Collegians runners sharing the road in the club's red, black and white colours."
-    },
-    {
-      "title": "One club, many runners",
-      "date": "2026-08-26",
-      "week": "2026-08-24",
-      "dateLabel": "Recent club activity",
-      "year": 2026,
-      "activity": "Club gathering",
-      "image": "assets/img/collegians-team-photo.png",
-      "alt": "Collegians Harriers members gathered together at a race",
-      "caption": "Members together before a club race outing."
-    }
-  ]
+    "updated":  "2026-08-27",
+    "photos":  [
+                   {
+                       "title":  "Spar Ladies Image 2026 08 23 At 19.08.54",
+                       "date":  "2026-08-27",
+                       "week":  "2026-08-24",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/gallery/2026/2026-08-27-spar-ladies-image-2026-08-23-at-19-08-54.jpeg",
+                       "alt":  "Collegians Harriers race day activity",
+                       "caption":  "Spar Ladies Image 2026 08 23 At 19.08.54"
+                   },
+                   {
+                       "title":  "One club, many runners",
+                       "date":  "2026-08-26",
+                       "week":  "2026-08-24",
+                       "dateLabel":  "Recent club activity",
+                       "year":  2026,
+                       "activity":  "Club gathering",
+                       "image":  "assets/img/collegians-team-photo.png",
+                       "alt":  "Collegians Harriers members gathered together at a race",
+                       "caption":  "Members together before a club race outing."
+                   },
+                   {
+                       "title":  "Together on the road",
+                       "date":  "2026-08-26",
+                       "week":  "2026-08-24",
+                       "dateLabel":  "Recent club activity",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/collegians-runners-race.png",
+                       "alt":  "Collegians Harriers runners racing together in club colours",
+                       "caption":  "Collegians runners sharing the road in the club\u0027s red, black and white colours."
+                   },
+                   {
+                       "title":  "Spar Ladies Race",
+                       "date":  "2026-08-23",
+                       "week":  "2026-08-17",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/gallery/2026/2026-08-23-spar-ladies-race.jpeg",
+                       "alt":  "Collegians\u0027 Ladies at the Spar Ladies 5 \u0026 10km",
+                       "caption":  "Collegians\u0027 Ladies at the 2026 Spar Ladies Race"
+                   }
+               ]
 }
