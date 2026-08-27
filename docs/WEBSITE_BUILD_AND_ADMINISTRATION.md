@@ -4,13 +4,15 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.2.0 |
-| Website build phase | Development v0.7.0 |
+| Handbook version | 1.2.1 |
+| Website build phase | Development v0.7.1 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
 | Repository | <https://github.com/wernerj123-adm/collegians-harriers-website> |
+| Confirmed staging site | <https://staging.collegiansharriers.co.za/> |
+| Confirmed staging document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
 | Planned production destination | Collegians Harriers cPanel hosting |
 
 This is the living operating manual for the Collegians Harriers website. It records what has been built, explains how the site works, and gives future administrators safe, repeatable instructions for keeping it current.
@@ -283,6 +285,16 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Added automatic internal-link, data-register and required-file validation before a ZIP can be produced.
 5. Rewrote the GitHub Pages-specific 404 base path only inside the package and added Apache 404, security, caching and compression rules.
 6. Added a deployment manifest containing the exact source branch and commit so every upload is traceable and recoverable.
+
+### Phase 0.7.1 — cPanel staging deployment
+
+1. Created and confirmed the staging domain at `staging.collegiansharriers.co.za`.
+2. Confirmed its cPanel document root as `/home/colletdr/staging.collegiansharriers.co.za/`.
+3. Backed up the initial staging files outside the public document root.
+4. Uploaded and extracted the validated `develop` package from commit `6de1730`.
+5. Moved the uploaded deployment ZIP outside the public document root after extraction.
+6. Verified the live Home, Results, Photos, weekly-result and server-side 404 pages on desktop and mobile with no broken images, horizontal overflow or browser errors.
+7. Confirmed that membership links open the official Jotform in a new tab with `noopener noreferrer` protection.
 
 ### Build milestone ledger
 
@@ -825,6 +837,29 @@ If the same commit has already been packaged, the builder stops rather than over
 6. Test navigation, membership links, photo albums, current and archived results, PDF downloads, the mobile menu and a deliberately missing URL.
 7. Do not promote staging to production until the club approves the staging review.
 
+#### Confirmed staging configuration — 27 August 2026
+
+| Item | Confirmed value |
+|---|---|
+| Staging address | `https://staging.collegiansharriers.co.za/` |
+| cPanel document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
+| Deployed source | `develop` commit `6de17300e7a1b82e9e359d3ab2486e8ea9ee4cd6` |
+| Deployment package | `/home/colletdr/collegians-harriers-staging-6de17300.zip` |
+| Pre-deployment backup | `/home/colletdr/staging-predeploy-defaults-20260827.zip` |
+
+The package and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
+
+#### Staging rollback procedure
+
+1. In cPanel File Manager, confirm that the current folder is exactly `/home/colletdr/staging.collegiansharriers.co.za/`.
+2. Before changing the deployed site, compress its current contents into a new dated ZIP stored in `/home/colletdr/`.
+3. Remove only the failed staging deployment files from the confirmed staging document root; do not alter `public_html` or any other domain folder.
+4. Extract the last known-good staging package from `/home/colletdr/` back into the staging document root.
+5. Confirm that `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the document root.
+6. Retest the Home page, results, photographs, downloads, mobile menu and a deliberately missing URL.
+
+The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-6de17300.zip` package as the current known-good website rollback package.
+
 Never store cPanel passwords, SFTP credentials or private keys in this repository or the deployment ZIP.
 
 #### Build a production package
@@ -936,7 +971,7 @@ The GitHub repository is the source of truth and provides the version history. P
 - Continue converting newly approved results to mobile-friendly HTML while retaining each source PDF.
 - Add a structured document library where required.
 - Expand dedicated pages for major hosted events.
-- Validate the generated package on the approved cPanel staging domain, then record the confirmed document root and rollback procedure without storing credentials.
+- Obtain club approval of the validated cPanel staging site, then promote the approved commit to `main` and build the production package.
 - Consider a simple content-management workflow if nontechnical administrators need to publish frequently.
 - Consider reusable site includes or a static-site generator if repeated navigation and footer maintenance becomes burdensome.
 
@@ -945,6 +980,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.2.1 — 27 August 2026
+
+- Recorded the successful cPanel staging deployment and live validation.
+- Documented the confirmed staging address, document root, source commit and off-root backup locations.
+- Added the tested staging rollback procedure and advanced the build to v0.7.1.
 
 ### 1.2.0 — 27 August 2026
 
