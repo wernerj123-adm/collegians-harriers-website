@@ -1,55 +1,79 @@
 {
-  "updated": "2026-08-27",
-  "photos": [
-    {
-      "title": "One club, many runners",
-      "album": "Club race gathering",
-      "albumSlug": "club-race-gathering",
-      "date": "2026-08-26",
-      "week": "2026-08-24",
-      "dateLabel": "Recent club activity",
-      "year": 2026,
-      "activity": "Club gathering",
-      "image": "assets/img/collegians-team-photo.png",
-      "alt": "Collegians Harriers members gathered together at a race",
-      "caption": "Members together before a club race outing."
-    },
-    {
-      "title": "Together on the road",
-      "album": "Road racing highlights",
-      "albumSlug": "road-racing-highlights",
-      "date": "2026-08-26",
-      "week": "2026-08-24",
-      "dateLabel": "Recent club activity",
-      "year": 2026,
-      "activity": "Race day",
-      "image": "assets/img/collegians-runners-race.png",
-      "alt": "Collegians Harriers runners racing together in club colours",
-      "caption": "Collegians runners sharing the road in the club's red, black and white colours."
-    },
-    {
-      "title": "Spar Ladies Image 2026 08 23 At 19.08.54",
-      "album": "Spar Ladies 2026",
-      "albumSlug": "spar-ladies-2026",
-      "date": "2026-08-23",
-      "week": "2026-08-17",
-      "year": 2026,
-      "activity": "Race day",
-      "image": "assets/img/gallery/2026/spar-ladies-2026/2026-08-23-spar-ladies-image-2026-08-23-at-19-08-54.jpeg",
-      "alt": "Collegians Harriers race day activity",
-      "caption": "Spar Ladies Image 2026 08 23 At 19.08.54"
-    },
-    {
-      "title": "Spar Ladies Race",
-      "album": "Spar Ladies 2026",
-      "albumSlug": "spar-ladies-2026",
-      "date": "2026-08-23",
-      "week": "2026-08-17",
-      "year": 2026,
-      "activity": "Race day",
-      "image": "assets/img/gallery/2026/spar-ladies-2026/2026-08-23-spar-ladies-race.jpeg",
-      "alt": "Collegians' Ladies at the Spar Ladies 5 and 10 km",
-      "caption": "Collegians' Ladies at the 2026 Spar Ladies Race"
-    }
-  ]
+    "updated":  "2026-08-27",
+    "photos":  [
+                   {
+                       "title":  "One club, many runners",
+                       "album":  "Club race gathering",
+                       "albumSlug":  "club-race-gathering",
+                       "date":  "2026-08-26",
+                       "week":  "2026-08-24",
+                       "dateLabel":  "Recent club activity",
+                       "year":  2026,
+                       "activity":  "Club gathering",
+                       "image":  "assets/img/collegians-team-photo.png",
+                       "alt":  "Collegians Harriers members gathered together at a race",
+                       "caption":  "Members together before a club race outing."
+                   },
+                   {
+                       "title":  "Together on the road",
+                       "album":  "Road racing highlights",
+                       "albumSlug":  "road-racing-highlights",
+                       "date":  "2026-08-26",
+                       "week":  "2026-08-24",
+                       "dateLabel":  "Recent club activity",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/collegians-runners-race.png",
+                       "alt":  "Collegians Harriers runners racing together in club colours",
+                       "caption":  "Collegians runners sharing the road in the club\u0027s red, black and white colours."
+                   },
+                   {
+                       "title":  "Spar Ladies Image 2026 08 23 At 19.08.54",
+                       "album":  "Spar Ladies 2026",
+                       "albumSlug":  "spar-ladies-2026",
+                       "date":  "2026-08-23",
+                       "week":  "2026-08-17",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/gallery/2026/spar-ladies-2026/2026-08-23-spar-ladies-image-2026-08-23-at-19-08-54.jpeg",
+                       "alt":  "Collegians Harriers race day activity",
+                       "caption":  "Spar Ladies Image 2026 08 23 At 19.08.54"
+                   },
+                   {
+                       "title":  "Spar Ladies Image 2026 08 23 At 19.09.41",
+                       "album":  "Spar Ladies Race",
+                       "albumSlug":  "spar-ladies-race",
+                       "date":  "2026-08-23",
+                       "week":  "2026-08-17",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/gallery/2026/spar-ladies-race/2026-08-23-spar-ladies-image-2026-08-23-at-19-09-41.jpeg",
+                       "alt":  "Spar Ladies Image 2026 08 23 At 19.09.41 - Collegians Harriers race day",
+                       "caption":  "Spar Ladies Image 2026 08 23 At 19.09.41"
+                   },
+                   {
+                       "title":  "Spar Ladies Image 2026 08 23 At 19.10.48",
+                       "album":  "Spar Ladies Race",
+                       "albumSlug":  "spar-ladies-race",
+                       "date":  "2026-08-23",
+                       "week":  "2026-08-17",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/gallery/2026/spar-ladies-race/2026-08-23-spar-ladies-image-2026-08-23-at-19-10-48.jpeg",
+                       "alt":  "Spar Ladies Image 2026 08 23 At 19.10.48 - Collegians Harriers race day",
+                       "caption":  "Spar Ladies Image 2026 08 23 At 19.10.48"
+                   },
+                   {
+                       "title":  "Spar Ladies Race",
+                       "album":  "Spar Ladies 2026",
+                       "albumSlug":  "spar-ladies-2026",
+                       "date":  "2026-08-23",
+                       "week":  "2026-08-17",
+                       "year":  2026,
+                       "activity":  "Race day",
+                       "image":  "assets/img/gallery/2026/spar-ladies-2026/2026-08-23-spar-ladies-race.jpeg",
+                       "alt":  "Collegians\u0027 Ladies at the Spar Ladies 5 and 10 km",
+                       "caption":  "Collegians\u0027 Ladies at the 2026 Spar Ladies Race"
+                   }
+               ]
 }
