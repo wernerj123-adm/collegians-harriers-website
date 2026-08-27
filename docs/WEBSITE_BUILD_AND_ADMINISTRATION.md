@@ -4,7 +4,7 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.2.3 |
+| Handbook version | 1.2.4 |
 | Website build phase | Development v0.7.3 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
@@ -310,6 +310,7 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Removed pointer-hover pausing so timed rotation continues while a desktop pointer rests over the photograph.
 4. Retained previous, next, direct slide selection, pause/play, swipe, reduced-motion and screen-reader status controls.
 5. Added a compact numeric position indicator for future registers containing more than ten photographs.
+6. Deployed the validated package to cPanel staging and confirmed six live slides, timed advancement, complete images and a clean browser log.
 
 ### Build milestone ledger
 
@@ -331,6 +332,7 @@ This table links the principal completed changes to their recoverable Git histor
 | `1566e45` | Refined the family discount footnote presentation |
 | `bcb5ab7` | Added accessibility and production-browser polish |
 | `0cfc41d` | Added the Home page club-photography slideshow |
+| `95f28a4` | Connected the Home slideshow to every approved photograph and deployed it to staging |
 
 ---
 
@@ -852,11 +854,12 @@ If the same commit has already been packaged, the builder stops rather than over
 |---|---|
 | Staging address | `https://staging.collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
-| Deployed source | `develop` commit `6de17300e7a1b82e9e359d3ab2486e8ea9ee4cd6` |
-| Deployment package | `/home/colletdr/collegians-harriers-staging-6de17300.zip` |
+| Deployed source | `develop` commit `95f28a4b2d2522a5f3b8ac8bdb4581fbc3815148` |
+| Current deployment package | `/home/colletdr/collegians-harriers-staging-95f28a4b.zip` |
+| Previous known-good package | `/home/colletdr/collegians-harriers-staging-6de17300.zip` |
 | Pre-deployment backup | `/home/colletdr/staging-predeploy-defaults-20260827.zip` |
 
-The package and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
+The deployment packages and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
 
 #### Staging rollback procedure
 
@@ -867,7 +870,7 @@ The package and backup are deliberately stored in `/home/colletdr/`, outside the
 5. Confirm that `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the document root.
 6. Retest the Home page, results, photographs, downloads, mobile menu and a deliberately missing URL.
 
-The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-6de17300.zip` package as the current known-good website rollback package.
+The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-95f28a4b.zip` package as the current known-good website rollback package; the earlier `collegians-harriers-staging-6de17300.zip` package remains available as a secondary fallback.
 
 Never store cPanel passwords, SFTP credentials or private keys in this repository or the deployment ZIP.
 
@@ -989,6 +992,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.2.4 — 27 August 2026
+
+- Recorded deployment of `develop` commit `95f28a4b` to the confirmed cPanel staging document root.
+- Confirmed that the live staging Home slideshow loads all six registered photographs, advances automatically and has no broken images or browser warnings.
+- Updated the off-root deployment and rollback package record.
 
 ### 1.2.3 — 27 August 2026
 
