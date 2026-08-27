@@ -139,8 +139,17 @@
 
 .gallery-dots {
   display: flex;
+  align-items: center;
   gap: 7px;
   padding: 0 5px;
+}
+
+.gallery-counter {
+  min-width: 54px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 850;
+  text-align: center;
 }
 
 .gallery-controls .gallery-dot {

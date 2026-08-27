@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.2.2 |
-| Website build phase | Development v0.7.2 |
+| Handbook version | 1.2.3 |
+| Website build phase | Development v0.7.3 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -303,6 +303,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Moved the navigation to the mobile menu slightly earlier on narrow screens to prevent header overflow.
 4. Retained the existing compact mobile header and verified the change across desktop and phone widths.
 
+### Phase 0.7.3 — Automatic complete-photo slideshow
+
+1. Connected the Home slideshow directly to the approved `assets/data/photos.json` register.
+2. Included every currently published photograph and made future guided photo uploads appear automatically without editing `index.html`.
+3. Removed pointer-hover pausing so timed rotation continues while a desktop pointer rests over the photograph.
+4. Retained previous, next, direct slide selection, pause/play, swipe, reduced-motion and screen-reader status controls.
+5. Added a compact numeric position indicator for future registers containing more than ten photographs.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -462,7 +470,7 @@ The relevant online locations are:
 4. Enter the same album/event name for photographs from the same day or event, for example `Spar Ladies 2026`.
 5. Review the date, public title, activity type, alternative text and caption.
 6. Answer **Yes** when asked whether to publish to `develop`.
-7. Wait for GitHub Pages and open the album from Club Photos to verify every image.
+7. Wait for GitHub Pages, open the album from Club Photos to verify every image, and confirm the new photographs also appear in the Home slideshow.
 
 Files sitting in an inbox are local and are not part of the public website. Once a file is committed and pushed to this public repository, it is publicly accessible. Check results for unnecessary personal information and confirm photograph permissions before answering **Yes** to publication.
 
@@ -523,27 +531,21 @@ The membership form appears in several pages. Always search the whole repository
 
 ### 5.3 Add photographs to the Home slideshow
 
+The Home slideshow reads the same approved `assets/data/photos.json` register used by Club Photos. Do not add slides manually to `index.html`.
+
 1. Obtain permission to publish the photograph.
-2. Prefer a clear landscape image at least 1200 pixels wide.
-3. Resize and optimise the image where possible; aim for approximately 1 MB or less without visible quality loss.
-4. Use a descriptive lowercase filename with hyphens, for example:
+2. Resize and optimise it where possible; prefer JPG for photographs and aim for approximately 1 MB or less without visible quality loss.
+3. Publish it using `Publish Photos.cmd` or the `collegians-publish-photos` skill described below.
+4. Confirm that the publisher added the image to `assets/data/photos.json`.
+5. Wait for GitHub Pages, then check the new photograph in both its Club Photos album and the Home slideshow.
+6. Check the Home crop at desktop and phone sizes; landscape photographs normally present best, while portrait photographs remain supported.
+7. Test automatic rotation, previous, next, slide selector, pause/play and swipe controls after substantial photo batches.
 
-```text
-collegians-hogsback-2026.jpg
-```
-
-5. Upload the file to `assets/img/`.
-6. Open `index.html` and find the block marked `data-gallery-slide`.
-7. Duplicate an existing `<figure>` slide.
-8. Update the image filename, accurate alternative text, slide number and short caption.
-9. Add one matching `data-gallery-dot` button and use the next number.
-10. Check the image crop at desktop and phone sizes.
-11. Test previous, next, dot and pause controls.
-12. Commit the image and code together with a `content:` description.
+The slideshow uses direct slide buttons for up to ten photographs. With larger collections, it automatically switches to a compact current/total counter while continuing to rotate through every registered photograph.
 
 ### 5.3A Add weekly photographs to Club Photos
 
-The Home slideshow is a small curated feature. Routine weekly activity photographs belong in `photos.html`, where they remain searchable after newer weeks are added.
+All approved registered photographs appear in the Home rotation and in `photos.html`, where they remain grouped into albums and searchable after newer weeks are added.
 
 #### Recommended: guided photo publisher
 
@@ -987,6 +989,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.2.3 — 27 August 2026
+
+- Connected the Home slideshow to the complete approved photo register.
+- Removed pointer-hover pausing and documented automatic inclusion of future photo uploads.
+- Replaced the former manual Home-slide editing instructions and advanced the build to v0.7.3.
 
 ### 1.2.2 — 27 August 2026
 
