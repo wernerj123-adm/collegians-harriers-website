@@ -12,6 +12,7 @@ node_modules/
 # Build/deployment artifacts
 *.zip
 *.tar.gz
+dist/
 
 # Local result-file drop folder; only its instructions belong in Git
 results-inbox/*

@@ -44,5 +44,5 @@ cPanel hosting for collegiansharriers.co.za. Production deployment will only hap
 2. Add confirmed weekly running times and route information.
 3. Add confirmed entry and rules links for The Longest Day.
 4. Expand dedicated pages for other hosted events as approved content is supplied.
-5. Build the staging-to-cPanel production deployment workflow.
+5. Validate the generated deployment package on the approved cPanel staging domain, then document the confirmed document root and rollback check.
 6. Expand the document library with approved club resources.

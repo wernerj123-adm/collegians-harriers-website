@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.7 |
-| Website build phase | Development v0.6.5 |
+| Handbook version | 1.2.0 |
+| Website build phase | Development v0.7.0 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -98,6 +98,9 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `scripts/build-time-trial-html.py` | Validates weekly result tables and creates responsive HTML result pages |
 | `scripts/publish-photos.ps1` | Validates, files, registers and optionally publishes photographs |
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
+| `Build Staging Package.cmd` | Creates a checked cPanel staging ZIP without uploading it |
+| `scripts/build-deployment-package.ps1` | Builds staging or production packages from the approved Git branch |
+| `deployment/production.htaccess` | Apache configuration copied into cPanel deployment packages |
 | `.agents/skills/collegians-publish-results/SKILL.md` | Codex workflow for safe current-result publication and verification |
 | `.agents/skills/collegians-publish-photos/SKILL.md` | Codex workflow for approved photo-album publication and verification |
 
@@ -272,6 +275,15 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Kept both skills connected to the existing PowerShell publishers instead of duplicating their deterministic filing and register logic.
 4. Added user-facing skill metadata and validated both skill packages with the official Codex skill validator.
 
+### Phase 0.7.0 — cPanel deployment packaging
+
+1. Added a one-click Windows builder for a clean cPanel staging upload ZIP.
+2. Restricted staging packages to committed `develop` content and production packages to committed `main` content.
+3. Excluded source-control, administration, inbox, documentation and automation files from the public package.
+4. Added automatic internal-link, data-register and required-file validation before a ZIP can be produced.
+5. Rewrote the GitHub Pages-specific 404 base path only inside the package and added Apache 404, security, caching and compression rules.
+6. Added a deployment manifest containing the exact source branch and commit so every upload is traceable and recoverable.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -397,6 +409,9 @@ Paste that address into the File Explorer address bar to open the folder. If the
 | Published photographs | `assets\img\gallery\YYYY\album-name\` | Photographs filed automatically by year and album/event |
 | Results Codex skill | `.agents\skills\collegians-publish-results\SKILL.md` | Guides Codex through result validation, publication and deployment checks |
 | Photos Codex skill | `.agents\skills\collegians-publish-photos\SKILL.md` | Guides Codex through approved album publication and gallery checks |
+| Staging package launcher | `Build Staging Package.cmd` | Produces a checked staging ZIP from committed `develop` content |
+| Deployment package builder | `scripts\build-deployment-package.ps1` | Advanced staging and production package builder |
+| Local deployment output | `dist\` | Ignored working folder containing generated site folders and ZIP files |
 | Administration handbook | `docs\WEBSITE_BUILD_AND_ADMINISTRATION.md` | This build record and operating manual |
 
 The relevant online locations are:
@@ -777,8 +792,50 @@ assets/css/example.css?v=20260826b
 2. Confirm that each local link points to a file that exists in the repository.
 3. Open a deliberately incorrect development-preview address and confirm that `404.html` appears.
 4. Test the Home, Membership, Running, Events and Results recovery links.
-5. The current 404 page uses the GitHub Pages project base `/collegians-harriers-website/`. Change its `<base>` value to `/` when deploying at the root of the production domain.
+5. The source 404 page uses the GitHub Pages project base `/collegians-harriers-website/`. The deployment package builder changes it to `/` inside the cPanel package; do not edit the source page for this purpose.
 6. Do not redirect every missing address automatically; visitors should be told that the requested page was not found.
+
+### 5.13 Build and upload a cPanel package
+
+The builder prepares a reviewable upload package. It does not sign in to cPanel, transmit files or change the live website.
+
+#### Build a staging package
+
+1. Confirm all intended changes are committed and pushed to `develop`.
+2. Confirm the working tree is clean.
+3. Double-click `Build Staging Package.cmd` in the main website folder.
+4. The builder copies only public HTML, CSS, JavaScript, JSON, images, fonts and PDFs into a new `dist/staging-COMMIT/site/` folder.
+5. It validates internal HTML and CSS references, result/photo register file paths, blocked administration extensions and required ZIP entries.
+6. It changes the packaged 404 base path to `/`, adds `.htaccess`, and writes `deployment-manifest.json` with the source commit.
+7. If all checks pass, use the ZIP named `dist/collegians-harriers-staging-COMMIT.zip` for the approved staging upload.
+
+If the same commit has already been packaged, the builder stops rather than overwriting it. An administrator may rebuild that exact commit with:
+
+```powershell
+.\scripts\build-deployment-package.ps1 -Channel staging -Force
+```
+
+#### Upload to cPanel staging
+
+1. Confirm the approved staging domain and its exact cPanel document root with the hosting administrator.
+2. Back up any existing staging files before replacement.
+3. Upload the generated ZIP into that document root using cPanel File Manager or the approved SFTP account.
+4. Extract the ZIP so `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the staging document root, not inside an extra folder.
+5. Open `deployment-manifest.json` on staging and confirm its commit matches the approved package.
+6. Test navigation, membership links, photo albums, current and archived results, PDF downloads, the mobile menu and a deliberately missing URL.
+7. Do not promote staging to production until the club approves the staging review.
+
+Never store cPanel passwords, SFTP credentials or private keys in this repository or the deployment ZIP.
+
+#### Build a production package
+
+Production packages are allowed only from a clean `main` branch after an approved promotion from `develop`:
+
+```powershell
+.\scripts\build-deployment-package.ps1 -Channel production
+```
+
+Record the previous production commit before uploading so rollback remains possible. The same validation and folder-placement rules used for staging apply to production.
 
 ---
 
@@ -879,7 +936,7 @@ The GitHub repository is the source of truth and provides the version history. P
 - Continue converting newly approved results to mobile-friendly HTML while retaining each source PDF.
 - Add a structured document library where required.
 - Expand dedicated pages for major hosted events.
-- Establish the staging-to-cPanel production deployment process.
+- Validate the generated package on the approved cPanel staging domain, then record the confirmed document root and rollback procedure without storing credentials.
 - Consider a simple content-management workflow if nontechnical administrators need to publish frequently.
 - Consider reusable site includes or a static-site generator if repeated navigation and footer maintenance becomes burdensome.
 
@@ -888,6 +945,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.2.0 — 27 August 2026
+
+- Added deterministic staging and production package generation for cPanel hosting.
+- Added clean-branch, public-file, link, data-register, 404, ZIP and manifest safeguards.
+- Documented staging upload, review, production promotion and rollback boundaries and advanced the build to v0.7.0.
 
 ### 1.1.7 — 27 August 2026
 
