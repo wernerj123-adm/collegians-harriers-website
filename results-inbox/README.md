@@ -17,11 +17,13 @@ This is the drop folder for approved result PDFs.
 6. Choose whether to publish the prepared files to the `develop` preview immediately.
 7. Check the live Results page after GitHub Pages finishes.
 
-The publisher moves approved files into the correct year folder and updates `assets/data/results.json`. PDFs left in this inbox are deliberately ignored by Git so they cannot be published accidentally.
+The publisher moves approved files into the correct year folder and updates `assets/data/results.json`. Weekly time-trial PDFs in the approved layout also receive an automatic responsive HTML page. PDFs left in this inbox are deliberately ignored by Git so they cannot be published accidentally.
 
-Only PDF files are accepted. The publisher never overwrites an existing published filename.
+Only PDF files are accepted. The publisher never overwrites an existing published filename, rejects an identical PDF uploaded under another name, and allows only one weekly time-trial result per date.
 
-The approved PDF remains the source document. If an HTML result page is created from it, register that page with the optional `-PagePath` setting. The Results card will open the mobile-friendly HTML page first and retain the PDF as a secondary link. This can be used for weekly time trials, road or trail races, championships and hosted events.
+The approved PDF remains the source document. Weekly time-trial HTML is registered automatically. For other result types, a separately prepared HTML page can be registered with the optional `-PagePath` setting. The Results card opens the mobile-friendly HTML page first and retains the PDF as a secondary link.
+
+When using Codex, the project skill is `$collegians-publish-results` at `.agents/skills/collegians-publish-results/SKILL.md`.
 
 Choose the category that matches the file:
 

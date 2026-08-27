@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish Collegians Results"
+  short_description: "Publish approved club results safely"
+  default_prompt: "Use $collegians-publish-results to validate and publish the approved result PDFs in the inbox."

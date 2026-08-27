@@ -8,3 +8,6 @@ COLLEGIANS HARRIERS PHOTO INBOX
 
 Only publish club-approved photographs. Confirm permission for identifiable
 people, especially children, and do not include private personal information.
+
+When using Codex, the project skill is $collegians-publish-photos at
+.agents\skills\collegians-publish-photos\SKILL.md.

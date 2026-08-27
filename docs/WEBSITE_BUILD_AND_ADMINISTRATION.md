@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.5 |
-| Website build phase | Development v0.6.4 |
+| Handbook version | 1.1.6 |
+| Website build phase | Development v0.6.5 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -98,6 +98,8 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `scripts/build-time-trial-html.py` | Validates weekly result tables and creates responsive HTML result pages |
 | `scripts/publish-photos.ps1` | Validates, files, registers and optionally publishes photographs |
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
+| `.agents/skills/collegians-publish-results/SKILL.md` | Codex workflow for safe current-result publication and verification |
+| `.agents/skills/collegians-publish-photos/SKILL.md` | Codex workflow for approved photo-album publication and verification |
 
 ### Important external links
 
@@ -263,6 +265,13 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Added automatic conversion of approved weekly PDFs into responsive HTML result pages while retaining the original PDF.
 5. Added table, date, route and finisher-count validation before a weekly result is moved out of the inbox.
 
+### Phase 0.6.5 — Reusable Codex publishing skills
+
+1. Added a project skill for approved current-result uploads, duplicate checks, weekly HTML creation, Git publication and live verification.
+2. Added a project skill for permission-aware photo inspection, album grouping, publication and gallery verification.
+3. Kept both skills connected to the existing PowerShell publishers instead of duplicating their deterministic filing and register logic.
+4. Added user-facing skill metadata and validated both skill packages with the official Codex skill validator.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -386,6 +395,8 @@ Paste that address into the File Explorer address bar to open the folder. If the
 | Photo publishing script | `scripts\publish-photos.ps1` | Advanced PowerShell version used by the launcher |
 | Photo register | `assets\data\photos.json` | Controls the latest activity and searchable photo archive |
 | Published photographs | `assets\img\gallery\YYYY\album-name\` | Photographs filed automatically by year and album/event |
+| Results Codex skill | `.agents\skills\collegians-publish-results\SKILL.md` | Guides Codex through result validation, publication and deployment checks |
+| Photos Codex skill | `.agents\skills\collegians-publish-photos\SKILL.md` | Guides Codex through approved album publication and gallery checks |
 | Administration handbook | `docs\WEBSITE_BUILD_AND_ADMINISTRATION.md` | This build record and operating manual |
 
 The relevant online locations are:
@@ -420,6 +431,17 @@ The relevant online locations are:
 7. Wait for GitHub Pages and open the album from Club Photos to verify every image.
 
 Files sitting in an inbox are local and are not part of the public website. Once a file is committed and pushed to this public repository, it is publicly accessible. Check results for unnecessary personal information and confirm photograph permissions before answering **Yes** to publication.
+
+#### Use the Codex publishing skills
+
+The Windows launchers remain the simplest manual option. When asking Codex to perform and verify the workflow, use either project skill explicitly:
+
+```text
+Use $collegians-publish-results to publish the approved result PDFs in the inbox.
+Use $collegians-publish-photos to publish the approved photographs in the photo inbox.
+```
+
+The skill files are version-controlled with the website. They tell Codex to use the existing publishers, preserve unrelated work, inspect the source material, respect duplicate and permission safeguards, wait for GitHub Pages, and verify the live result or album. They do not themselves grant permission to publish unapproved material.
 
 ### 5.1 Change text on an existing page
 
@@ -849,6 +871,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.6 — 27 August 2026
+
+- Added project-local Codex skills for current results and photo-album publication.
+- Documented their locations, invocation names, authorization boundaries and relationship to the Windows launchers.
+- Advanced the development build to v0.6.5.
 
 ### 1.1.5 — 27 August 2026
 
