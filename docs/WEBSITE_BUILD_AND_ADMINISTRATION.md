@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.0 |
-| Website build phase | Development v0.6.0 |
-| Last updated | 26 August 2026 |
+| Handbook version | 1.1.1 |
+| Website build phase | Development v0.6.1 |
+| Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -91,8 +91,11 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/results/archive/YYYY/` | Curated historical PDFs organised by season and result type |
 | `results/YYYY/` | Approved HTML result pages organised by year |
 | `results-inbox/` | Local drop folder for approved PDFs awaiting preparation |
+| `photo-inbox/` | Local drop folder for approved JPG and PNG photographs |
 | `Publish Results.cmd` | User-friendly Windows launcher for result publishing |
+| `Publish Photos.cmd` | User-friendly Windows launcher for weekly photo publishing |
 | `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
+| `scripts/publish-photos.ps1` | Validates, files, registers and optionally publishes photographs |
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
 
 ### Important external links
@@ -227,6 +230,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Added year and activity filters with full-size image links.
 4. Created a data-driven photo register so weekly additions do not require rebuilding the page layout.
 5. Linked the Home slideshow to the complete photo archive and recorded photography/privacy controls.
+
+### Phase 0.6.1 — Guided photo publisher
+
+1. Added a simple `photo-inbox` drop folder and Windows launcher.
+2. Added guided prompts for the date, public title, activity, alternative text and caption.
+3. Added real-image validation, consistent filenames, weekly grouping and overwrite protection.
+4. Added automatic photo-register updates and optional publication to `develop`.
+5. Kept the same staged-change and branch safeguards used by the results publisher.
 
 ### Build milestone ledger
 
@@ -376,15 +387,31 @@ collegians-hogsback-2026.jpg
 
 The Home slideshow is a small curated feature. Routine weekly activity photographs belong in `photos.html`, where they remain searchable after newer weeks are added.
 
+#### Recommended: guided photo publisher
+
 1. Confirm that every photograph is approved for public use. Take particular care with identifiable children.
-2. Resize and optimise large files before publication. Prefer JPG for ordinary photographs and use descriptive lowercase filenames.
-3. Create the year folder if needed, then place the images in `assets/img/gallery/YYYY/`.
-4. Open `assets/data/photos.json` and add one object per image inside the `photos` array:
+2. Resize and optimise large files before publication. Prefer JPG for ordinary photographs and aim for approximately 1 MB or less.
+3. Copy the approved JPG, JPEG or PNG files into `photo-inbox/`.
+4. Double-click `Publish Photos.cmd` in the main website folder.
+5. For each photograph, review or enter the activity date, public title, activity type, alternative text and caption.
+6. The publisher validates the image, calculates its Monday week date, moves it into `assets/img/gallery/YYYY/` and updates `assets/data/photos.json`.
+7. When asked, choose whether to commit and push the prepared photographs to `develop` immediately.
+8. Wait for GitHub Pages, then open `photos.html` and check the newest highlights, search, filters and full-size images.
+
+Photographs from the same Monday-to-Sunday week are kept together in the latest-activity area. The publisher never overwrites an existing public filename. Give a revised or alternate photograph a different public title.
+
+The guided publisher offers these consistent activity types: **Time trial**, **Training**, **Race day**, **Trail running**, **Hosted event** and **Club gathering**.
+
+#### Manual fallback
+
+1. Create the year folder if needed and place the optimised image in `assets/img/gallery/YYYY/`.
+2. Open `assets/data/photos.json` and add one object inside the `photos` array:
 
 ```json
 {
   "title": "Tuesday time trial",
   "date": "2026-09-01",
+  "week": "2026-08-31",
   "year": 2026,
   "activity": "Time trial",
   "image": "assets/img/gallery/2026/tuesday-time-trial-2026-09-01.jpg",
@@ -393,12 +420,10 @@ The Home slideshow is a small curated feature. Routine weekly activity photograp
 }
 ```
 
-5. Use the real activity date in `YYYY-MM-DD` format. Photographs with the newest date automatically appear in the latest-activity area.
-6. Keep activity names consistent, such as `Time trial`, `Training`, `Race day`, `Trail running`, `Hosted event` or `Club gathering`.
-7. Write accurate alternative text describing what is visible; do not use filenames as alternative text.
-8. Update the top-level `updated` date in `photos.json`.
-9. Open `photos.html` and test the latest section, search, year filter, activity filter and every new full-size image link.
-10. Check the gallery on desktop and mobile, then commit the images and register together.
+3. Use the real activity date and the Monday of that week in `YYYY-MM-DD` format.
+4. Write accurate alternative text describing what is visible; do not use the filename as alternative text.
+5. Update the top-level `updated` date in `photos.json`.
+6. Test the gallery on desktop and mobile, then commit the image and register together.
 
 Alternative text should briefly describe what is visible and useful, not repeat the caption word for word.
 
@@ -726,6 +751,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.1 — 27 August 2026
+
+- Added the guided photo-inbox publisher, Windows launcher and publication safeguards.
+- Documented automatic weekly grouping and the manual JSON fallback.
+- Advanced the development build to v0.6.1.
 
 ### 1.1.0 — 26 August 2026
 

@@ -47,8 +47,8 @@
   };
 
   const renderFeatured = () => {
-    const latestDate = photos.length ? photos[0].date : null;
-    const latest = photos.filter((photo) => photo.date === latestDate);
+    const latestWeek = photos.length ? (photos[0].week || photos[0].date) : null;
+    const latest = photos.filter((photo) => (photo.week || photo.date) === latestWeek);
     featuredList.replaceChildren(...latest.map((photo) => makeCard(photo, true)));
   };
 
