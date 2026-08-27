@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.4 |
-| Website build phase | Development v0.6.3 |
+| Handbook version | 1.1.5 |
+| Website build phase | Development v0.6.4 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -95,6 +95,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `Publish Results.cmd` | User-friendly Windows launcher for result publishing |
 | `Publish Photos.cmd` | User-friendly Windows launcher for weekly photo publishing |
 | `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
+| `scripts/build-time-trial-html.py` | Validates weekly result tables and creates responsive HTML result pages |
 | `scripts/publish-photos.ps1` | Validates, files, registers and optionally publishes photographs |
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
 
@@ -254,6 +255,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Updated the photo publisher to store files in `assets/img/gallery/YYYY/album-name/`.
 5. Grouped the existing Spar Ladies photographs into the `Spar Ladies 2026` album and folder.
 
+### Phase 0.6.4 — Duplicate-safe HTML time-trial publishing
+
+1. Removed an exact duplicate of the 25 August 2026 weekly result from the current-results register and public files.
+2. Added a one-weekly-result-per-date rule so renaming the same upload cannot create a second time-trial card.
+3. Added SHA-256 content checking so an already published PDF is rejected even when its filename or category is changed.
+4. Added automatic conversion of approved weekly PDFs into responsive HTML result pages while retaining the original PDF.
+5. Added table, date, route and finisher-count validation before a weekly result is moved out of the inbox.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -366,6 +375,7 @@ Paste that address into the File Explorer address bar to open the folder. If the
 | Results launcher | `Publish Results.cmd` | Opens the guided result uploader |
 | Results inbox | `results-inbox\` | Place approved PDF result files here before running the launcher |
 | Results publishing script | `scripts\publish-results.ps1` | Advanced PowerShell version used by the launcher |
+| Time-trial HTML converter | `scripts\build-time-trial-html.py` | Reads the approved weekly PDF and creates the mobile-friendly result page |
 | Current-results register | `assets\data\results.json` | Records current published results and optional HTML pages |
 | Published current PDFs | `assets\results\YYYY\` | Final result PDFs filed automatically by year |
 | Result HTML pages | `results\YYYY\` | Mobile-friendly result pages, when available |
@@ -395,8 +405,9 @@ The relevant online locations are:
 2. Return to the main website folder and double-click `Publish Results.cmd`.
 3. If several PDFs are present, choose shared information for the whole batch or individual information for every file.
 4. Review the date, title, result type and optional note.
-5. Answer **Yes** when asked whether to publish to `develop`.
-6. Wait for GitHub Pages and verify the new result from the Results hub.
+5. For **Time trial**, the publisher verifies that the date is not already published and automatically creates the HTML result page.
+6. Answer **Yes** when asked whether to publish to `develop`.
+7. Wait for GitHub Pages and verify both **View results** and **PDF** from the Results hub.
 
 #### Quick weekly photo upload
 
@@ -516,14 +527,22 @@ Only publish a final, checked result file. Confirm names, categories, times, pos
 3. Double-click `Publish Results.cmd` in the main website folder.
 4. If more than one PDF is present, choose **shared event information** or **individual information**.
 5. Shared mode asks for the date, category and optional note once, then creates titles from the filenames. Individual mode asks for all information for every PDF.
-6. The publisher validates the PDF, moves it into the correct `assets/results/YYYY/` folder and updates `assets/data/results.json`.
-7. When asked, choose whether to commit and push the prepared result to `develop` immediately.
-8. Wait for GitHub Pages, then open the Results page and verify the new card, filter and published link.
-9. If publishing is declined, the files remain prepared locally for later review and commit.
+6. For a weekly time trial, the publisher confirms that no time trial is already registered for that date and that the PDF contents have not previously been published.
+7. The publisher reads the approved weekly PDF, checks its displayed date, route headings, result rows and finisher counts, then automatically creates a responsive HTML page.
+8. The original PDF is moved into `assets/results/YYYY/`, the HTML page is stored in `results/YYYY/`, and both paths are added to `assets/data/results.json`.
+9. When asked, choose whether to commit and push the prepared result to `develop` immediately.
+10. Wait for GitHub Pages, then open the Results page and verify **View results**, the responsive tables and the original **PDF** link.
+11. If publishing is declined, the files remain prepared locally for later review and commit.
 
-The publisher never overwrites an existing public filename. Give a corrected result a new descriptive filename, such as one ending in `-corrected.pdf`.
+The publisher never overwrites an existing public filename. It also allows only one weekly time-trial result per date. If a weekly result needs correction, do not upload it as a second result: replace the existing approved PDF and regenerate its existing HTML page in one controlled correction commit. Keep the same public paths so members do not see duplicate cards or broken bookmarks.
 
-The PDF is always retained as the approved source. When a readable HTML result page has also been created, pass its repository-relative location to the publisher with `-PagePath`, for example:
+Automatic HTML conversion applies to PDFs exported in the approved Herman's Delight weekly-results layout. If the converter cannot reliably read the date, routes, rows or totals, it leaves the PDF in `results-inbox/` and explains what must be corrected. Python and the `pdfplumber` reader are required; if the launcher reports that the reader is missing, run:
+
+```powershell
+py -m pip install pdfplumber
+```
+
+The PDF is always retained as the approved source. Weekly time trials receive an HTML page automatically. For another result type with a separately prepared HTML page, pass its repository-relative location to the publisher with `-PagePath`, for example:
 
 ```powershell
 .\scripts\publish-results.ps1 -PagePath "results/2026/2026-08-25-hermans-delight-weekly-results.html"
@@ -577,7 +596,7 @@ Example register entry:
 }
 ```
 
-If a result is corrected later, update both the approved PDF and its HTML page, update the displayed revision date, and use a commit description that clearly says it is a corrected result.
+If a result is corrected later, update both the approved PDF and its existing HTML page, update the displayed revision date, and use a commit description that clearly says it is a corrected result. Do not add a second register entry for the same weekly date.
 
 #### Maintain the historical archive
 
@@ -830,6 +849,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.5 — 27 August 2026
+
+- Added same-date and identical-content duplicate protection for result uploads.
+- Added automatic responsive HTML conversion and validation for weekly time-trial PDFs.
+- Documented the single-record correction policy and advanced the build to v0.6.4.
 
 ### 1.1.4 — 27 August 2026
 

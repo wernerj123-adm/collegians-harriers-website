@@ -16,6 +16,7 @@ $ErrorActionPreference = 'Stop'
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repositoryRoot = Split-Path -Parent $scriptDirectory
 $manifestPath = Join-Path $repositoryRoot 'assets\data\results.json'
+$timeTrialConverterPath = Join-Path $scriptDirectory 'build-time-trial-html.py'
 if ([string]::IsNullOrWhiteSpace($InboxPath)) {
     $InboxPath = Join-Path $repositoryRoot 'results-inbox'
 }
@@ -62,6 +63,62 @@ function Get-DefaultTitle {
     $words = ($words -replace '[-_]+', ' ').Trim()
     if ([string]::IsNullOrWhiteSpace($words)) { return 'Club results' }
     return (Get-Culture).TextInfo.ToTitleCase($words.ToLowerInvariant())
+}
+
+function Get-PythonExecutable {
+    foreach ($commandName in @('python', 'py')) {
+        $command = Get-Command $commandName -ErrorAction SilentlyContinue
+        if ($command) { return $command.Source }
+    }
+    return $null
+}
+
+function Convert-TimeTrialPdf {
+    param(
+        [Parameter(Mandatory)] [string]$PdfPath,
+        [Parameter(Mandatory)] [string]$OutputPath,
+        [Parameter(Mandatory)] [string]$Date,
+        [Parameter(Mandatory)] [string]$Title,
+        [Parameter(Mandatory)] [string]$PdfWebPath,
+        [switch]$ValidateOnly
+    )
+
+    if (-not (Test-Path -LiteralPath $timeTrialConverterPath -PathType Leaf)) {
+        throw "Time-trial HTML converter not found: $timeTrialConverterPath"
+    }
+    $python = Get-PythonExecutable
+    if (-not $python) {
+        throw 'Python is required for time-trial HTML conversion. Install Python, then run: py -m pip install pdfplumber'
+    }
+
+    $arguments = @(
+        $timeTrialConverterPath,
+        '--pdf', $PdfPath,
+        '--date', $Date,
+        '--title', $Title,
+        '--pdf-web-path', $PdfWebPath
+    )
+    if ($ValidateOnly) {
+        $arguments += '--validate-only'
+    }
+    else {
+        $arguments += @('--output', $OutputPath)
+    }
+
+    $conversionOutput = @(& $python @arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        $details = ($conversionOutput | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine
+        if ($details -match 'No module named [''"]pdfplumber[''"]') {
+            $details += "`nInstall the required reader with: py -m pip install pdfplumber"
+        }
+        throw $details
+    }
+    try {
+        return ($conversionOutput[-1].ToString() | ConvertFrom-Json)
+    }
+    catch {
+        throw "The time-trial converter did not return a valid summary for $PdfPath"
+    }
 }
 
 function Read-WithDefault {
@@ -130,6 +187,18 @@ if (-not [string]::IsNullOrWhiteSpace($PagePath)) {
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 $records = @($manifest.results)
 $preparedPaths = New-Object System.Collections.Generic.List[string]
+$preparedPagePaths = New-Object System.Collections.Generic.List[string]
+$knownPdfHashes = @{}
+foreach ($record in $records) {
+    if ([string]::IsNullOrWhiteSpace($record.file)) { continue }
+    $registeredPath = Join-Path $repositoryRoot ($record.file.Replace('/', '\'))
+    if (Test-Path -LiteralPath $registeredPath -PathType Leaf) {
+        $registeredHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $registeredPath).Hash
+        if (-not $knownPdfHashes.ContainsKey($registeredHash)) {
+            $knownPdfHashes[$registeredHash] = $record.file
+        }
+    }
+}
 $preparedCount = 0
 $useSharedInfo = $false
 $sharedDateText = ''
@@ -209,6 +278,21 @@ foreach ($pdf in $pdfFiles) {
     $destinationPath = Join-Path $yearDirectory $safeName
     $relativePath = "assets/results/$season/$safeName"
 
+    $sameDayTimeTrial = @($records | Where-Object {
+        $_.category -eq 'time-trial' -and $_.date -eq $dateText
+    }) | Select-Object -First 1
+    if ($category -eq 'time-trial' -and $sameDayTimeTrial) {
+        Write-Warning "A weekly time-trial result is already published for ${dateText}: $($sameDayTimeTrial.title). The new file was left in the inbox."
+        Write-Host 'Use the documented correction process if the published result must be replaced.' -ForegroundColor Yellow
+        continue
+    }
+
+    $incomingHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $pdf.FullName).Hash
+    if ($knownPdfHashes.ContainsKey($incomingHash)) {
+        Write-Warning "$($pdf.Name) has exactly the same contents as $($knownPdfHashes[$incomingHash]) and was left in the inbox."
+        continue
+    }
+
     if (Test-Path -LiteralPath $destinationPath) {
         Write-Warning "$relativePath already exists. Rename a corrected file before publishing; nothing was overwritten."
         continue
@@ -218,11 +302,36 @@ foreach ($pdf in $pdfFiles) {
         continue
     }
 
+    $currentPagePath = $relativePagePath
+    $resolvedCurrentPagePath = $null
+    $conversionSummary = $null
+    $pageWasGenerated = $false
+    if ($category -eq 'time-trial' -and [string]::IsNullOrWhiteSpace($currentPagePath)) {
+        $pageFileName = [System.IO.Path]::GetFileNameWithoutExtension($safeName) + '.html'
+        $currentPagePath = "results/$season/$pageFileName"
+        $resolvedCurrentPagePath = Join-Path $repositoryRoot ($currentPagePath.Replace('/', '\'))
+        if (Test-Path -LiteralPath $resolvedCurrentPagePath) {
+            Write-Warning "$currentPagePath already exists. The PDF was left in the inbox so no HTML page is overwritten."
+            continue
+        }
+        try {
+            $conversionSummary = Convert-TimeTrialPdf -PdfPath $pdf.FullName -OutputPath $resolvedCurrentPagePath -Date $dateText -Title $title -PdfWebPath $relativePath -ValidateOnly:$DryRun
+        }
+        catch {
+            Write-Warning "Could not create a reliable HTML version of $($pdf.Name). The PDF was left in the inbox.`n$($_.Exception.Message)"
+            continue
+        }
+        if (-not $DryRun) { $pageWasGenerated = $true }
+        if ([string]::IsNullOrWhiteSpace($note) -and $conversionSummary.note) {
+            $note = $conversionSummary.note
+        }
+    }
+
     Write-Host "  Title:    $title"
     Write-Host "  Date:     $dateText"
     Write-Host "  Category: $($categoryLabels[$category])"
     Write-Host "  File:     $relativePath"
-    if ($relativePagePath) { Write-Host "  Web page: $relativePagePath" }
+    if ($currentPagePath) { Write-Host "  Web page: $currentPagePath" }
     if ($note) { Write-Host "  Note:     $note" }
 
     if ($DryRun) {
@@ -232,19 +341,29 @@ foreach ($pdf in $pdfFiles) {
     }
 
     [System.IO.Directory]::CreateDirectory($yearDirectory) | Out-Null
-    Move-Item -LiteralPath $pdf.FullName -Destination $destinationPath
+    try {
+        Move-Item -LiteralPath $pdf.FullName -Destination $destinationPath
+    }
+    catch {
+        if ($pageWasGenerated -and $resolvedCurrentPagePath -and (Test-Path -LiteralPath $resolvedCurrentPagePath)) {
+            Remove-Item -LiteralPath $resolvedCurrentPagePath -Force
+        }
+        throw
+    }
     $record = [ordered]@{
         title    = $title
         date     = $dateText
         category = $category
         season   = $season
     }
-    if ($relativePagePath) { $record['page'] = $relativePagePath }
+    if ($currentPagePath) { $record['page'] = $currentPagePath }
     $record['file'] = $relativePath
     $record['format'] = 'PDF'
     if ($note) { $record['note'] = $note }
     $records += [pscustomobject]$record
     $preparedPaths.Add($relativePath) | Out-Null
+    if ($pageWasGenerated) { $preparedPagePaths.Add($currentPagePath) | Out-Null }
+    $knownPdfHashes[$incomingHash] = $relativePath
     $preparedCount++
 }
 
@@ -296,8 +415,8 @@ try {
         throw 'Unable to check the staged Git changes.'
     }
 
-    $gitPaths = @('assets/data/results.json') + @($preparedPaths)
-    if ($relativePagePath) { $gitPaths += $relativePagePath }
+    $gitPaths = @('assets/data/results.json') + @($preparedPaths) + @($preparedPagePaths)
+    if ($relativePagePath -and $preparedCount -eq 1) { $gitPaths += $relativePagePath }
     & git add -- @gitPaths
     if ($LASTEXITCODE -ne 0) { throw 'Git could not stage the prepared result files.' }
 
