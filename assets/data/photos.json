@@ -1,0 +1,25 @@
+{
+  "updated": "2026-08-26",
+  "photos": [
+    {
+      "title": "Together on the road",
+      "date": "2026-08-26",
+      "dateLabel": "Recent club activity",
+      "year": 2026,
+      "activity": "Race day",
+      "image": "assets/img/collegians-runners-race.png",
+      "alt": "Collegians Harriers runners racing together in club colours",
+      "caption": "Collegians runners sharing the road in the club's red, black and white colours."
+    },
+    {
+      "title": "One club, many runners",
+      "date": "2026-08-26",
+      "dateLabel": "Recent club activity",
+      "year": 2026,
+      "activity": "Club gathering",
+      "image": "assets/img/collegians-team-photo.png",
+      "alt": "Collegians Harriers members gathered together at a race",
+      "caption": "Members together before a club race outing."
+    }
+  ]
+}

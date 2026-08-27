@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.0.9 |
-| Website build phase | Development v0.5.9 |
+| Handbook version | 1.1.0 |
+| Website build phase | Development v0.6.0 |
 | Last updated | 26 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -54,6 +54,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | Race and event results | `race-event-results.html` | Searchable race, championship and hosted-event history |
 | Results archive | `results-archive.html` | Searchable historical library organised by season and result type |
 | News | `news.html` | Club announcements, member stories and event updates |
+| Club Photos | `photos.html` | Latest weekly activity gallery and searchable permanent photo archive |
 | Contact | `contact.html` | Club location, contact routes and social channels |
 | The Longest Day | `longest-day.html` | Dedicated 2026 event page |
 | Page not found | `404.html` | Branded recovery page for old, moved or mistyped links |
@@ -77,12 +78,15 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/results-library-v054.css` | Published-results register and filters |
 | `assets/css/result-detail-v057.css` | Responsive tables and summary cards for HTML result pages |
 | `assets/css/results-archive-v058.css` | Searchable archive layout, filters and historical result rows |
+| `assets/css/photo-library-v060.css` | Weekly photo highlights, archive cards and responsive filters |
 | `assets/js/site.js` | Mobile navigation behaviour |
 | `assets/js/home-gallery-v05.js` | Slideshow rotation, controls, swipe and reduced-motion behaviour |
 | `assets/js/results-library-v054.js` | Loads, sorts and filters approved result records |
 | `assets/js/results-archive-v058.js` | Loads and filters the historical archive register |
+| `assets/js/photo-library-v060.js` | Loads weekly photos and provides archive search and filters |
 | `assets/data/results.json` | Versioned public register of approved result files |
 | `assets/data/results-archive.json` | Generated register of approved historical result files |
+| `assets/data/photos.json` | Public register of approved weekly and archived photographs |
 | `assets/results/YYYY/` | Approved result documents organised by year |
 | `assets/results/archive/YYYY/` | Curated historical PDFs organised by season and result type |
 | `results/YYYY/` | Approved HTML result pages organised by year |
@@ -215,6 +219,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Grouped 45 road, championship and hosted-event records into a separate searchable page.
 4. Added document, season and latest-result summaries with responsive search and filtering.
 5. Retained the original approved PDFs while allowing new publications to use the mobile-friendly HTML format.
+
+### Phase 0.6.0 — Weekly club photo library
+
+1. Added a dedicated Club Photos page to the main navigation and footer.
+2. Added a latest-activity area and a permanent searchable photo archive.
+3. Added year and activity filters with full-size image links.
+4. Created a data-driven photo register so weekly additions do not require rebuilding the page layout.
+5. Linked the Home slideshow to the complete photo archive and recorded photography/privacy controls.
 
 ### Build milestone ledger
 
@@ -359,6 +371,34 @@ collegians-hogsback-2026.jpg
 10. Check the image crop at desktop and phone sizes.
 11. Test previous, next, dot and pause controls.
 12. Commit the image and code together with a `content:` description.
+
+### 5.3A Add weekly photographs to Club Photos
+
+The Home slideshow is a small curated feature. Routine weekly activity photographs belong in `photos.html`, where they remain searchable after newer weeks are added.
+
+1. Confirm that every photograph is approved for public use. Take particular care with identifiable children.
+2. Resize and optimise large files before publication. Prefer JPG for ordinary photographs and use descriptive lowercase filenames.
+3. Create the year folder if needed, then place the images in `assets/img/gallery/YYYY/`.
+4. Open `assets/data/photos.json` and add one object per image inside the `photos` array:
+
+```json
+{
+  "title": "Tuesday time trial",
+  "date": "2026-09-01",
+  "year": 2026,
+  "activity": "Time trial",
+  "image": "assets/img/gallery/2026/tuesday-time-trial-2026-09-01.jpg",
+  "alt": "Collegians runners starting the Tuesday time trial",
+  "caption": "Members heading out for the weekly club time trial."
+}
+```
+
+5. Use the real activity date in `YYYY-MM-DD` format. Photographs with the newest date automatically appear in the latest-activity area.
+6. Keep activity names consistent, such as `Time trial`, `Training`, `Race day`, `Trail running`, `Hosted event` or `Club gathering`.
+7. Write accurate alternative text describing what is visible; do not use filenames as alternative text.
+8. Update the top-level `updated` date in `photos.json`.
+9. Open `photos.html` and test the latest section, search, year filter, activity filter and every new full-size image link.
+10. Check the gallery on desktop and mobile, then commit the images and register together.
 
 Alternative text should briefly describe what is visible and useful, not repeat the caption word for word.
 
@@ -686,6 +726,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.0 — 26 August 2026
+
+- Added the weekly Club Photos page, permanent photo archive and site-wide navigation link.
+- Documented the data-driven weekly photo publishing and privacy procedure.
+- Advanced the development build to v0.6.0.
 
 ### 1.0.9 — 26 August 2026
 
