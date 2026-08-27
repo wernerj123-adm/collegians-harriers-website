@@ -4,7 +4,7 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.6 |
+| Handbook version | 1.1.7 |
 | Website build phase | Development v0.6.5 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
@@ -443,6 +443,23 @@ Use $collegians-publish-photos to publish the approved photographs in the photo 
 
 The skill files are version-controlled with the website. They tell Codex to use the existing publishers, preserve unrelated work, inspect the source material, respect duplicate and permission safeguards, wait for GitHub Pages, and verify the live result or album. They do not themselves grant permission to publish unapproved material.
 
+#### Install or share the Codex skills
+
+The repository already contains the skills under `.agents/skills/`. A colleague who clones or pulls the website repository receives those project-local copies automatically and can invoke them while working in that repository.
+
+To make the skills available across all Codex projects on one Windows PC, copy the complete skill folders into the user's personal Codex skills folder:
+
+```text
+%USERPROFILE%\.codex\skills\collegians-publish-results\
+%USERPROFILE%\.codex\skills\collegians-publish-photos\
+```
+
+Copy each complete folder, including `SKILL.md` and `agents/openai.yaml`; do not transfer only the Markdown file. Start a new Codex task after installation so the new skills are discovered.
+
+For transfer by email, OneDrive or another approved file-sharing service, ZIP each complete skill folder separately. The receiving colleague should inspect the instructions, extract each folder into `%USERPROFILE%\.codex\skills\`, and retain the skill folder name. These Collegians skills still require a checkout of this website containing the matching `Publish Results.cmd`, `Publish Photos.cmd` and `scripts/` files.
+
+Personal copies do not update automatically. When the repository skills change, review the update and replace or reinstall the personal copies. Project-local copies update normally when the colleague pulls the latest repository branch.
+
 ### 5.1 Change text on an existing page
 
 1. Identify the page from the table in Section 2.
@@ -871,6 +888,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.7 — 27 August 2026
+
+- Documented personal installation of the two Collegians publishing skills.
+- Added colleague-transfer instructions for Git repository, folder-copy and ZIP workflows.
+- Clarified discovery, required companion scripts and future skill updates.
 
 ### 1.1.6 — 27 August 2026
 
