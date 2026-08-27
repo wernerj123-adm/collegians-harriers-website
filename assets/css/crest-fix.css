@@ -9,3 +9,73 @@
 @media(max-width:1050px){.brand{min-width:auto}.brand-copy strong{font-size:1.75rem}.crest-shell{width:68px!important;height:80px!important;flex-basis:68px!important}.crest-shell img{height:76px!important;max-width:68px!important}}
 @media(max-width:760px){.site-header .nav{min-height:88px}.brand-copy strong{font-size:1.35rem;letter-spacing:.09em}.crest-shell{width:56px!important;height:68px!important;flex-basis:56px!important}.crest-shell img{height:64px!important;max-width:56px!important}.brand{gap:10px}}
 @media(max-width:480px){.brand-copy strong{font-size:1.05rem;letter-spacing:.07em}}
+
+/* v0.7.1 desktop header CTA alignment */
+.site-header .join-btn.desktop {
+  flex: 0 0 auto;
+  min-width: 144px;
+  min-height: 50px;
+  padding: 12px 22px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@media (min-width: 1051px) and (max-width: 1280px) {
+  .site-header .nav {
+    gap: 14px;
+  }
+
+  .site-header .brand {
+    min-width: 275px;
+    gap: 14px;
+  }
+
+  .site-header .nav-links {
+    gap: 12px;
+    font-size: 0.8rem;
+  }
+
+  .site-header .join-btn.desktop {
+    min-width: 132px;
+    padding-inline: 16px;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 1070px) {
+  .site-header .brand {
+    min-width: auto;
+  }
+
+  .site-header .nav-links {
+    position: fixed;
+    top: 146px;
+    left: 20px;
+    right: 20px;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+
+  .site-header .nav-links.open {
+    display: flex;
+  }
+
+  .site-header .join-btn.desktop {
+    display: none;
+  }
+
+  .site-header .menu-btn {
+    display: block;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header .nav-links {
+    top: 122px;
+  }
+}

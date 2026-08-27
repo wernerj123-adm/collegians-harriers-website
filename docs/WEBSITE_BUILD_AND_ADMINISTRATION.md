@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.2.1 |
-| Website build phase | Development v0.7.1 |
+| Handbook version | 1.2.2 |
+| Website build phase | Development v0.7.2 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -295,6 +295,13 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 5. Moved the uploaded deployment ZIP outside the public document root after extraction.
 6. Verified the live Home, Results, Photos, weekly-result and server-side 404 pages on desktop and mobile with no broken images, horizontal overflow or browser errors.
 7. Confirmed that membership links open the official Jotform in a new tab with `noopener noreferrer` protection.
+
+### Phase 0.7.2 — Header membership CTA alignment
+
+1. Changed the desktop “Join the club” header action to a wider horizontal button that keeps its text on one line.
+2. Added intermediate desktop spacing rules so the brand, navigation and membership action remain aligned without crowding.
+3. Moved the navigation to the mobile menu slightly earlier on narrow screens to prevent header overflow.
+4. Retained the existing compact mobile header and verified the change across desktop and phone widths.
 
 ### Build milestone ledger
 
@@ -980,6 +987,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.2.2 — 27 August 2026
+
+- Refined the desktop “Join the club” header action into a consistently aligned, single-line button.
+- Added an earlier responsive navigation breakpoint to prevent crowding on narrow desktop screens.
+- Advanced the development build to v0.7.2.
 
 ### 1.2.1 — 27 August 2026
 
