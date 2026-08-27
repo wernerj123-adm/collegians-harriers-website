@@ -32,10 +32,11 @@ function Get-RelativePath {
         [Parameter(Mandatory)] [string]$TargetPath
     )
 
-    return [System.IO.Path]::GetRelativePath(
-        [System.IO.Path]::GetFullPath($BasePath),
-        [System.IO.Path]::GetFullPath($TargetPath)
-    )
+    $baseFullPath = [System.IO.Path]::GetFullPath($BasePath).TrimEnd('\') + '\'
+    $targetFullPath = [System.IO.Path]::GetFullPath($TargetPath)
+    $baseUri = New-Object System.Uri($baseFullPath)
+    $targetUri = New-Object System.Uri($targetFullPath)
+    return [System.Uri]::UnescapeDataString($baseUri.MakeRelativeUri($targetUri).ToString()).Replace('/', '\')
 }
 
 function Copy-PublicTree {
