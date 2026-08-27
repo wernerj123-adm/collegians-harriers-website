@@ -75,6 +75,25 @@ function Read-WithDefault {
     return $answer.Trim()
 }
 
+function Read-CategoryChoice {
+    param([Parameter(Mandatory)] [string]$DefaultKey)
+
+    Write-Host 'Choose a category:'
+    $categoryKeys = @($categoryLabels.Keys)
+    for ($index = 0; $index -lt $categoryKeys.Count; $index++) {
+        Write-Host "  $($index + 1). $($categoryLabels[$categoryKeys[$index]])"
+    }
+    $defaultNumber = [array]::IndexOf($categoryKeys, $DefaultKey) + 1
+    do {
+        $categoryChoice = Read-Host "Category number [$defaultNumber]"
+        if ([string]::IsNullOrWhiteSpace($categoryChoice)) { $categoryChoice = [string]$defaultNumber }
+        $choiceNumber = 0
+        $validChoice = [int]::TryParse($categoryChoice, [ref]$choiceNumber) -and $choiceNumber -ge 1 -and $choiceNumber -le $categoryKeys.Count
+        if (-not $validChoice) { Write-Host 'Enter one of the category numbers shown above.' -ForegroundColor Yellow }
+    } until ($validChoice)
+    return $categoryKeys[$choiceNumber - 1]
+}
+
 if (-not (Test-Path -LiteralPath $InboxPath -PathType Container)) {
     throw "Results inbox not found: $InboxPath"
 }
@@ -112,6 +131,37 @@ $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 $records = @($manifest.results)
 $preparedPaths = New-Object System.Collections.Generic.List[string]
 $preparedCount = 0
+$useSharedInfo = $false
+$sharedDateText = ''
+$sharedCategory = $DefaultCategory
+$sharedNote = ''
+
+if (-not $NonInteractive -and $pdfFiles.Count -gt 1) {
+    Write-Host ''
+    Write-Host "$($pdfFiles.Count) result files found."
+    Write-Host '  1. Apply shared event information to all files'
+    Write-Host '  2. Enter information individually for every file'
+    do {
+        $informationMode = Read-Host 'Information mode [1]'
+        if ([string]::IsNullOrWhiteSpace($informationMode)) { $informationMode = '1' }
+        $validMode = $informationMode -in @('1', '2')
+        if (-not $validMode) { Write-Host 'Enter 1 or 2.' -ForegroundColor Yellow }
+    } until ($validMode)
+    $useSharedInfo = $informationMode -eq '1'
+
+    if ($useSharedInfo) {
+        $firstDate = if ($pdfFiles[0].BaseName -match '^(\d{4}-\d{2}-\d{2})') { $Matches[1] } else { Get-Date -Format 'yyyy-MM-dd' }
+        do {
+            $sharedDateText = Read-WithDefault -Prompt 'Shared event/result date (YYYY-MM-DD)' -Default $firstDate
+            $sharedParsedDate = [datetime]::MinValue
+            $validSharedDate = [datetime]::TryParseExact($sharedDateText, 'yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::None, [ref]$sharedParsedDate)
+            if (-not $validSharedDate) { Write-Host 'Enter a valid date in YYYY-MM-DD format.' -ForegroundColor Yellow }
+        } until ($validSharedDate)
+        $sharedCategory = Read-CategoryChoice -DefaultKey $DefaultCategory
+        $sharedNote = (Read-Host 'Shared optional note, distance or revision (press Enter to skip)').Trim()
+        Write-Host 'Titles will be generated from each filename. Use descriptive filenames for shared mode.' -ForegroundColor DarkGray
+    }
+}
 
 foreach ($pdf in $pdfFiles) {
     Write-Host ''
@@ -122,12 +172,12 @@ foreach ($pdf in $pdfFiles) {
         continue
     }
 
-    $dateText = if ($pdf.BaseName -match '^(\d{4}-\d{2}-\d{2})') { $Matches[1] } else { '' }
+    $dateText = if ($useSharedInfo) { $sharedDateText } elseif ($pdf.BaseName -match '^(\d{4}-\d{2}-\d{2})') { $Matches[1] } else { '' }
     if ($NonInteractive -and [string]::IsNullOrWhiteSpace($dateText)) {
         Write-Warning "$($pdf.Name) does not begin with YYYY-MM-DD and was skipped."
         continue
     }
-    if (-not $NonInteractive) {
+    if (-not $NonInteractive -and -not $useSharedInfo) {
         $dateText = Read-WithDefault -Prompt 'Event/result date (YYYY-MM-DD)' -Default $(if ($dateText) { $dateText } else { (Get-Date -Format 'yyyy-MM-dd') })
     }
 
@@ -138,24 +188,12 @@ foreach ($pdf in $pdfFiles) {
     }
 
     $defaultTitle = Get-DefaultTitle -BaseName $pdf.BaseName
-    $title = if (-not [string]::IsNullOrWhiteSpace($TitleOverride)) { $TitleOverride.Trim() } elseif ($NonInteractive) { $defaultTitle } else { Read-WithDefault -Prompt 'Public result title' -Default $defaultTitle }
-    $category = $DefaultCategory
-    $note = if ([string]::IsNullOrWhiteSpace($NoteOverride)) { '' } else { $NoteOverride.Trim() }
+    $title = if (-not [string]::IsNullOrWhiteSpace($TitleOverride)) { $TitleOverride.Trim() } elseif ($NonInteractive -or $useSharedInfo) { $defaultTitle } else { Read-WithDefault -Prompt 'Public result title' -Default $defaultTitle }
+    $category = if ($useSharedInfo) { $sharedCategory } else { $DefaultCategory }
+    $note = if ($useSharedInfo) { $sharedNote } elseif ([string]::IsNullOrWhiteSpace($NoteOverride)) { '' } else { $NoteOverride.Trim() }
 
-    if (-not $NonInteractive) {
-        Write-Host 'Choose a category:'
-        $categoryKeys = @($categoryLabels.Keys)
-        for ($index = 0; $index -lt $categoryKeys.Count; $index++) {
-            Write-Host "  $($index + 1). $($categoryLabels[$categoryKeys[$index]])"
-        }
-        do {
-            $categoryChoice = Read-Host 'Category number [1]'
-            if ([string]::IsNullOrWhiteSpace($categoryChoice)) { $categoryChoice = '1' }
-            $choiceNumber = 0
-            $validChoice = [int]::TryParse($categoryChoice, [ref]$choiceNumber) -and $choiceNumber -ge 1 -and $choiceNumber -le $categoryKeys.Count
-            if (-not $validChoice) { Write-Host 'Enter one of the category numbers shown above.' -ForegroundColor Yellow }
-        } until ($validChoice)
-        $category = $categoryKeys[$choiceNumber - 1]
+    if (-not $NonInteractive -and -not $useSharedInfo) {
+        $category = Read-CategoryChoice -DefaultKey $DefaultCategory
         if ([string]::IsNullOrWhiteSpace($NoteOverride)) {
             $note = (Read-Host 'Optional note, distance or revision (press Enter to skip)').Trim()
         }
@@ -239,7 +277,7 @@ if (-not $NonInteractive -and -not $Publish) {
 
 if (-not $publishNow) {
     Write-Host 'The files are prepared locally but have not been published.'
-    Write-Host 'Run this publisher again with -Publish, or commit and push the prepared files manually.'
+    Write-Host 'Commit and push the prepared files manually when they are approved.'
     exit 0
 }
 

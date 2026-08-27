@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.2 |
-| Website build phase | Development v0.6.1 |
+| Handbook version | 1.1.3 |
+| Website build phase | Development v0.6.2 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -239,6 +239,13 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Added automatic photo-register updates and optional publication to `develop`.
 5. Kept the same staged-change and branch safeguards used by the results publisher.
 
+### Phase 0.6.2 — Batch or individual upload information
+
+1. Added an information-mode choice whenever either publisher finds multiple files.
+2. Shared mode asks for the common date and result category or photo activity once, then derives individual titles from filenames.
+3. Individual mode retains the full per-file questions for titles, notes, alternative text and captions.
+4. Verified both shared and individual multi-file preparation flows in isolated test repositories.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -378,17 +385,19 @@ The relevant online locations are:
 
 1. Copy the final approved PDF into `results-inbox\`.
 2. Return to the main website folder and double-click `Publish Results.cmd`.
-3. Review the date, title, result type and optional note.
-4. Answer **Yes** when asked whether to publish to `develop`.
-5. Wait for GitHub Pages and verify the new result from the Results hub.
+3. If several PDFs are present, choose shared information for the whole batch or individual information for every file.
+4. Review the date, title, result type and optional note.
+5. Answer **Yes** when asked whether to publish to `develop`.
+6. Wait for GitHub Pages and verify the new result from the Results hub.
 
 #### Quick weekly photo upload
 
 1. Confirm publication permission and copy the approved JPG, JPEG or PNG files into `photo-inbox\`.
 2. Return to the main website folder and double-click `Publish Photos.cmd`.
-3. Review the date, public title, activity type, alternative text and caption for every photograph.
-4. Answer **Yes** when asked whether to publish to `develop`.
-5. Wait for GitHub Pages and verify the newest group and archive entries on Club Photos.
+3. If several photographs are present, choose shared weekly information or individual information for every image.
+4. Review the date, public title, activity type, alternative text and caption.
+5. Answer **Yes** when asked whether to publish to `develop`.
+6. Wait for GitHub Pages and verify the newest group and archive entries on Club Photos.
 
 Files sitting in an inbox are local and are not part of the public website. Once a file is committed and pushed to this public repository, it is publicly accessible. Check results for unnecessary personal information and confirm photograph permissions before answering **Yes** to publication.
 
@@ -449,10 +458,11 @@ The Home slideshow is a small curated feature. Routine weekly activity photograp
 2. Resize and optimise large files before publication. Prefer JPG for ordinary photographs and aim for approximately 1 MB or less.
 3. Copy the approved JPG, JPEG or PNG files into `photo-inbox/`.
 4. Double-click `Publish Photos.cmd` in the main website folder.
-5. For each photograph, review or enter the activity date, public title, activity type, alternative text and caption.
-6. The publisher validates the image, calculates its Monday week date, moves it into `assets/img/gallery/YYYY/` and updates `assets/data/photos.json`.
-7. When asked, choose whether to commit and push the prepared photographs to `develop` immediately.
-8. Wait for GitHub Pages, then open `photos.html` and check the newest highlights, search, filters and full-size images.
+5. If more than one file is present, choose **shared weekly information** or **individual information**.
+6. Shared mode asks for the date and activity once, then creates titles and captions from the filenames. Individual mode asks for all information for every photograph.
+7. The publisher validates the image, calculates its Monday week date, moves it into `assets/img/gallery/YYYY/` and updates `assets/data/photos.json`.
+8. When asked, choose whether to commit and push the prepared photographs to `develop` immediately.
+9. Wait for GitHub Pages, then open `photos.html` and check the newest highlights, search, filters and full-size images.
 
 Photographs from the same Monday-to-Sunday week are kept together in the latest-activity area. The publisher never overwrites an existing public filename. Give a revised or alternate photograph a different public title.
 
@@ -492,11 +502,12 @@ Only publish a final, checked result file. Confirm names, categories, times, pos
 1. Name the approved PDF with its date first, for example `2026-08-25-tuesday-time-trial-results.pdf`.
 2. Copy it into `results-inbox/`.
 3. Double-click `Publish Results.cmd` in the main website folder.
-4. Review or enter the date, public title, category and optional note.
-5. The publisher validates the PDF, moves it into the correct `assets/results/YYYY/` folder and updates `assets/data/results.json`.
-6. When asked, choose whether to commit and push the prepared result to `develop` immediately.
-7. Wait for GitHub Pages, then open the Results page and verify the new card, filter and published link.
-8. If publishing is declined, the files remain prepared locally for later review and commit.
+4. If more than one PDF is present, choose **shared event information** or **individual information**.
+5. Shared mode asks for the date, category and optional note once, then creates titles from the filenames. Individual mode asks for all information for every PDF.
+6. The publisher validates the PDF, moves it into the correct `assets/results/YYYY/` folder and updates `assets/data/results.json`.
+7. When asked, choose whether to commit and push the prepared result to `develop` immediately.
+8. Wait for GitHub Pages, then open the Results page and verify the new card, filter and published link.
+9. If publishing is declined, the files remain prepared locally for later review and commit.
 
 The publisher never overwrites an existing public filename. Give a corrected result a new descriptive filename, such as one ending in `-corrected.pdf`.
 
@@ -807,6 +818,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.3 — 27 August 2026
+
+- Added shared-batch and individual-file information modes to both uploaders.
+- Documented how filenames supply individual titles when shared information is selected.
+- Advanced the development build to v0.6.2.
 
 ### 1.1.2 — 27 August 2026
 
