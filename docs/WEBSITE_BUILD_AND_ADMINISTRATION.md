@@ -4,7 +4,7 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.1.1 |
+| Handbook version | 1.1.2 |
 | Website build phase | Development v0.6.1 |
 | Last updated | 27 August 2026 |
 | Active development branch | `develop` |
@@ -335,6 +335,62 @@ Before rollback:
 ---
 
 ## 5. Day-to-day website administration
+
+### Administrator quick locations
+
+The current Windows website folder is:
+
+```text
+C:\Users\werne\.codex\.chatgpt-projects\g-p-6a607ca870548191a931d90470b9a4ba\website
+```
+
+Paste that address into the File Explorer address bar to open the folder. If the repository is moved or copied in future, use the new folder that contains `index.html`, `Publish Results.cmd` and `Publish Photos.cmd` as the website root.
+
+| Purpose | Location from the website root | What it does |
+|---|---|---|
+| Results launcher | `Publish Results.cmd` | Opens the guided result uploader |
+| Results inbox | `results-inbox\` | Place approved PDF result files here before running the launcher |
+| Results publishing script | `scripts\publish-results.ps1` | Advanced PowerShell version used by the launcher |
+| Current-results register | `assets\data\results.json` | Records current published results and optional HTML pages |
+| Published current PDFs | `assets\results\YYYY\` | Final result PDFs filed automatically by year |
+| Result HTML pages | `results\YYYY\` | Mobile-friendly result pages, when available |
+| Historical result register | `assets\data\results-archive.json` | Records the approved historical archive |
+| Historical PDFs | `assets\results\archive\YYYY\` | Approved archive files arranged by year and type |
+| Photos launcher | `Publish Photos.cmd` | Opens the guided weekly photo uploader |
+| Photo inbox | `photo-inbox\` | Place approved JPG, JPEG or PNG files here before running the launcher |
+| Photo publishing script | `scripts\publish-photos.ps1` | Advanced PowerShell version used by the launcher |
+| Photo register | `assets\data\photos.json` | Controls the latest activity and searchable photo archive |
+| Published photographs | `assets\img\gallery\YYYY\` | Photographs filed automatically by year |
+| Administration handbook | `docs\WEBSITE_BUILD_AND_ADMINISTRATION.md` | This build record and operating manual |
+
+The relevant online locations are:
+
+| Online destination | Address |
+|---|---|
+| GitHub repository | <https://github.com/wernerj123-adm/collegians-harriers-website> |
+| Development website | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
+| Results hub | <https://wernerj123-adm.github.io/collegians-harriers-website/results.html> |
+| Time-trial history | <https://wernerj123-adm.github.io/collegians-harriers-website/time-trial-results.html> |
+| Race and event history | <https://wernerj123-adm.github.io/collegians-harriers-website/race-event-results.html> |
+| Club Photos | <https://wernerj123-adm.github.io/collegians-harriers-website/photos.html> |
+
+#### Quick result upload
+
+1. Copy the final approved PDF into `results-inbox\`.
+2. Return to the main website folder and double-click `Publish Results.cmd`.
+3. Review the date, title, result type and optional note.
+4. Answer **Yes** when asked whether to publish to `develop`.
+5. Wait for GitHub Pages and verify the new result from the Results hub.
+
+#### Quick weekly photo upload
+
+1. Confirm publication permission and copy the approved JPG, JPEG or PNG files into `photo-inbox\`.
+2. Return to the main website folder and double-click `Publish Photos.cmd`.
+3. Review the date, public title, activity type, alternative text and caption for every photograph.
+4. Answer **Yes** when asked whether to publish to `develop`.
+5. Wait for GitHub Pages and verify the newest group and archive entries on Club Photos.
+
+Files sitting in an inbox are local and are not part of the public website. Once a file is committed and pushed to this public repository, it is publicly accessible. Check results for unnecessary personal information and confirm photograph permissions before answering **Yes** to publication.
 
 ### 5.1 Change text on an existing page
 
@@ -751,6 +807,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.1.2 — 27 August 2026
+
+- Added the exact current Windows website folder and a quick-reference location table.
+- Recorded the result and photo launchers, inboxes, scripts, registers and published destinations.
+- Added concise result and weekly-photo upload checklists with public-repository guidance.
 
 ### 1.1.1 — 27 August 2026
 
