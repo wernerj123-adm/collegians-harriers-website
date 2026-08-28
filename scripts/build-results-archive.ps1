@@ -237,6 +237,48 @@ foreach ($item in $additionalResults) {
     Add-ArchivePdf @parameters
 }
 
+# Curated hosted-event records recovered from the previous club website. These
+# PDFs live in the repository so future archive rebuilds retain the collection
+# even when the separate results inbox is unavailable.
+$legacyHostedResults = @(
+    @{ Year = 2003; File = '2003-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2003' },
+    @{ Year = 2004; File = '2004-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2004' },
+    @{ Year = 2007; File = '2007-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2007' },
+    @{ Year = 2008; File = '2008-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2008' },
+    @{ Year = 2009; File = '2009-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2009' },
+    @{ Year = 2013; File = '2013-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2013' },
+    @{ Year = 2018; File = '2018-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2018' },
+    @{ Year = 2019; File = '2019-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2019' },
+    @{ Year = 2022; File = '2022-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2022' },
+    @{ Year = 2023; File = '2023-umgeni-water-marathon-results.pdf'; Title = 'uMngeni Water Marathon Results - 2023' },
+    @{ Year = 2024; File = '2024-umngeni-uthukela-water-marathon-results.pdf'; Title = 'uMngeni-uThukela Water Marathon Results - 2024'; Date = '2024-03-10' },
+    @{ Year = 1983; File = '1983-duke-of-york-results.pdf'; Title = 'Duke of York Results - 1983'; Date = '1983-10-16' },
+    @{ Year = 2012; File = '2012-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2012'; Date = '2012-10-28' },
+    @{ Year = 2013; File = '2013-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2013'; Date = '2013-10-27' },
+    @{ Year = 2014; File = '2014-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2014'; Date = '2014-10-26' },
+    @{ Year = 2015; File = '2015-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2015'; Date = '2015-10-25' },
+    @{ Year = 2016; File = '2016-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2016'; Date = '2016-10-02' },
+    @{ Year = 2017; File = '2017-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2017'; Date = '2017-10-08' },
+    @{ Year = 2019; File = '2019-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2019'; Date = '2019-11-03' },
+    @{ Year = 2017; File = '2017-longest-day-solo-results.pdf'; Title = 'The Longest Day Solo Results - 2017' },
+    @{ Year = 2017; File = '2017-longest-day-team-results.pdf'; Title = 'The Longest Day Team Results - 2017' },
+    @{ Year = 2019; File = '2019-longest-day-results.pdf'; Title = 'The Longest Day Results - 2019' }
+)
+
+foreach ($item in $legacyHostedResults) {
+    $relativePath = "assets/results/archive/$($item.Year)/hosted-event/$($item.File)"
+    $parameters = @{
+        SourcePath = Join-Path $repositoryRoot ($relativePath.Replace('/', '\'))
+        RelativePath = $relativePath
+        Title = [string]$item.Title
+        Date = if ($item.Date) { [string]$item.Date } else { "$($item.Year)-01-01" }
+        DateLabel = if ($item.Date) { $null } else { "$($item.Year) event" }
+        Season = [int]$item.Year
+        Category = 'hosted-event'
+    }
+    Add-ArchivePdf @parameters
+}
+
 $manifest = [ordered]@{
     updated = Get-Date -Format 'yyyy-MM-dd'
     sourcePolicy = 'Approved result PDFs only; drafts, templates, witness sheets, signed forms and administrative documents excluded.'

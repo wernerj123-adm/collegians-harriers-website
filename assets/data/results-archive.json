@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-26",
+  "updated": "2026-08-28",
   "sourcePolicy": "Approved result PDFs only; drafts, templates, witness sheets, signed forms and administrative documents excluded.",
   "results": [
     {
@@ -1062,6 +1062,14 @@
       "format": "PDF"
     },
     {
+      "title": "uMngeni-uThukela Water Marathon Results - 2024",
+      "date": "2024-03-10",
+      "season": 2024,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2024/hosted-event/2024-umngeni-uthukela-water-marathon-results.pdf",
+      "format": "PDF"
+    },
+    {
       "title": "Herman's Delight Weekly Results - 5 March 2024",
       "date": "2024-03-05",
       "season": 2024,
@@ -1578,6 +1586,15 @@
       "dateLabel": "2023 event"
     },
     {
+      "title": "uMngeni Water Marathon Results - 2023",
+      "date": "2023-01-01",
+      "season": 2023,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2023/hosted-event/2023-umgeni-water-marathon-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2023 event"
+    },
+    {
       "title": "Bill Butler Results - 2022",
       "date": "2022-01-01",
       "season": 2022,
@@ -1592,6 +1609,15 @@
       "season": 2022,
       "category": "hosted-event",
       "file": "assets/results/archive/2022/hosted-event/2022-hogsback-trail-run-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2022 event"
+    },
+    {
+      "title": "uMngeni Water Marathon Results - 2022",
+      "date": "2022-01-01",
+      "season": 2022,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2022/hosted-event/2022-umgeni-water-marathon-results.pdf",
       "format": "PDF",
       "dateLabel": "2022 event"
     },
@@ -1614,11 +1640,37 @@
       "dateLabel": "2020 event"
     },
     {
+      "title": "Duke of York Results - 2019",
+      "date": "2019-11-03",
+      "season": 2019,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2019/hosted-event/2019-duke-of-york-results.pdf",
+      "format": "PDF"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2019",
       "date": "2019-01-01",
       "season": 2019,
       "category": "hosted-event",
       "file": "assets/results/archive/2019/hosted-event/2019-hogsback-trail-run-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2019 event"
+    },
+    {
+      "title": "The Longest Day Results - 2019",
+      "date": "2019-01-01",
+      "season": 2019,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2019/hosted-event/2019-longest-day-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2019 event"
+    },
+    {
+      "title": "uMngeni Water Marathon Results - 2019",
+      "date": "2019-01-01",
+      "season": 2019,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2019/hosted-event/2019-umgeni-water-marathon-results.pdf",
       "format": "PDF",
       "dateLabel": "2019 event"
     },
@@ -1632,6 +1684,23 @@
       "dateLabel": "2018 event"
     },
     {
+      "title": "uMngeni Water Marathon Results - 2018",
+      "date": "2018-01-01",
+      "season": 2018,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2018/hosted-event/2018-umgeni-water-marathon-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2018 event"
+    },
+    {
+      "title": "Duke of York Results - 2017",
+      "date": "2017-10-08",
+      "season": 2017,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2017/hosted-event/2017-duke-of-york-results.pdf",
+      "format": "PDF"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2017",
       "date": "2017-01-01",
       "season": 2017,
@@ -1639,6 +1708,32 @@
       "file": "assets/results/archive/2017/hosted-event/2017-hogsback-trail-run-results.pdf",
       "format": "PDF",
       "dateLabel": "2017 event"
+    },
+    {
+      "title": "The Longest Day Solo Results - 2017",
+      "date": "2017-01-01",
+      "season": 2017,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2017/hosted-event/2017-longest-day-solo-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2017 event"
+    },
+    {
+      "title": "The Longest Day Team Results - 2017",
+      "date": "2017-01-01",
+      "season": 2017,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2017/hosted-event/2017-longest-day-team-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2017 event"
+    },
+    {
+      "title": "Duke of York Results - 2016",
+      "date": "2016-10-02",
+      "season": 2016,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2016/hosted-event/2016-duke-of-york-results.pdf",
+      "format": "PDF"
     },
     {
       "title": "Hogsback Trail Run Results - 2016",
@@ -1650,6 +1745,14 @@
       "dateLabel": "2016 event"
     },
     {
+      "title": "Duke of York Results - 2015",
+      "date": "2015-10-25",
+      "season": 2015,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2015/hosted-event/2015-duke-of-york-results.pdf",
+      "format": "PDF"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2015",
       "date": "2015-01-01",
       "season": 2015,
@@ -1657,6 +1760,14 @@
       "file": "assets/results/archive/2015/hosted-event/2015-hogsback-trail-run-results.pdf",
       "format": "PDF",
       "dateLabel": "2015 event"
+    },
+    {
+      "title": "Duke of York Results - 2014",
+      "date": "2014-10-26",
+      "season": 2014,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2014/hosted-event/2014-duke-of-york-results.pdf",
+      "format": "PDF"
     },
     {
       "title": "Hogsback Trail Run Results - 2014",
@@ -1668,6 +1779,14 @@
       "dateLabel": "2014 event"
     },
     {
+      "title": "Duke of York Results - 2013",
+      "date": "2013-10-27",
+      "season": 2013,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2013/hosted-event/2013-duke-of-york-results.pdf",
+      "format": "PDF"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2013",
       "date": "2013-01-01",
       "season": 2013,
@@ -1675,6 +1794,23 @@
       "file": "assets/results/archive/2013/hosted-event/2013-hogsback-trail-run-results.pdf",
       "format": "PDF",
       "dateLabel": "2013 event"
+    },
+    {
+      "title": "uMngeni Water Marathon Results - 2013",
+      "date": "2013-01-01",
+      "season": 2013,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2013/hosted-event/2013-umgeni-water-marathon-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2013 event"
+    },
+    {
+      "title": "Duke of York Results - 2012",
+      "date": "2012-10-28",
+      "season": 2012,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2012/hosted-event/2012-duke-of-york-results.pdf",
+      "format": "PDF"
     },
     {
       "title": "Hogsback Trail Run Results - 2012",
@@ -1704,11 +1840,29 @@
       "dateLabel": "2009 event"
     },
     {
+      "title": "uMngeni Water Marathon Results - 2009",
+      "date": "2009-01-01",
+      "season": 2009,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2009/hosted-event/2009-umgeni-water-marathon-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2009 event"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2008",
       "date": "2008-01-01",
       "season": 2008,
       "category": "hosted-event",
       "file": "assets/results/archive/2008/hosted-event/2008-hogsback-trail-run-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2008 event"
+    },
+    {
+      "title": "uMngeni Water Marathon Results - 2008",
+      "date": "2008-01-01",
+      "season": 2008,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2008/hosted-event/2008-umgeni-water-marathon-results.pdf",
       "format": "PDF",
       "dateLabel": "2008 event"
     },
@@ -1722,6 +1876,15 @@
       "dateLabel": "2007 event"
     },
     {
+      "title": "uMngeni Water Marathon Results - 2007",
+      "date": "2007-01-01",
+      "season": 2007,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2007/hosted-event/2007-umgeni-water-marathon-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2007 event"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2004",
       "date": "2004-01-01",
       "season": 2004,
@@ -1731,11 +1894,29 @@
       "dateLabel": "2004 event"
     },
     {
+      "title": "uMngeni Water Marathon Results - 2004",
+      "date": "2004-01-01",
+      "season": 2004,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2004/hosted-event/2004-umgeni-water-marathon-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2004 event"
+    },
+    {
       "title": "Hogsback Trail Run Results - 2003",
       "date": "2003-01-01",
       "season": 2003,
       "category": "hosted-event",
       "file": "assets/results/archive/2003/hosted-event/2003-hogsback-trail-run-results.pdf",
+      "format": "PDF",
+      "dateLabel": "2003 event"
+    },
+    {
+      "title": "uMngeni Water Marathon Results - 2003",
+      "date": "2003-01-01",
+      "season": 2003,
+      "category": "hosted-event",
+      "file": "assets/results/archive/2003/hosted-event/2003-umgeni-water-marathon-results.pdf",
       "format": "PDF",
       "dateLabel": "2003 event"
     },
@@ -1792,6 +1973,14 @@
       "file": "assets/results/archive/1997/hosted-event/1997-hogsback-trail-run-results.pdf",
       "format": "PDF",
       "dateLabel": "1997 event"
+    },
+    {
+      "title": "Duke of York Results - 1983",
+      "date": "1983-10-16",
+      "season": 1983,
+      "category": "hosted-event",
+      "file": "assets/results/archive/1983/hosted-event/1983-duke-of-york-results.pdf",
+      "format": "PDF"
     }
   ]
 }
