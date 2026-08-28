@@ -150,6 +150,50 @@ function Test-PackageLinks {
     }
 }
 
+function Optimize-ResultArchivePackage {
+    param([Parameter(Mandatory)] [string]$SiteRoot)
+
+    $registerPath = Join-Path $SiteRoot 'assets\data\results-archive.json'
+    if (-not (Test-Path -LiteralPath $registerPath -PathType Leaf)) {
+        return [pscustomobject]@{ HtmlPages = 0; OmittedPdfs = 0; OmittedPdfBytes = 0 }
+    }
+
+    $directPdfReferences = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    $attributePattern = '(?i)(?:href|src|data-source)\s*=\s*["''](?<url>[^"'']+\.pdf(?:[?#][^"'']*)?)["'']'
+    foreach ($document in Get-ChildItem -LiteralPath $SiteRoot -Filter '*.html' -File -Recurse) {
+        $content = Get-Content -Raw -LiteralPath $document.FullName
+        foreach ($match in [regex]::Matches($content, $attributePattern)) {
+            $reference = ($match.Groups['url'].Value -split '[?#]', 2)[0]
+            if ($reference -match '^[a-z][a-z0-9+.-]*:' -or $reference.StartsWith('//')) { continue }
+            $target = Resolve-PackageReference -Reference $reference -DocumentDirectory $document.DirectoryName -SiteRoot $SiteRoot
+            if ($target -and $target.StartsWith([System.IO.Path]::GetFullPath($SiteRoot), [System.StringComparison]::OrdinalIgnoreCase)) {
+                $relative = (Get-RelativePath -BasePath $SiteRoot -TargetPath $target).Replace('\', '/')
+                $directPdfReferences.Add($relative) | Out-Null
+            }
+        }
+    }
+
+    $register = Get-Content -Raw -LiteralPath $registerPath | ConvertFrom-Json
+    $htmlPages = 0
+    $omittedPdfs = 0
+    [long]$omittedPdfBytes = 0
+    $githubBase = 'https://wernerj123-adm.github.io/collegians-harriers-website/'
+    foreach ($record in $register.results) {
+        if ([string]::IsNullOrWhiteSpace($record.page) -or [string]::IsNullOrWhiteSpace($record.file)) { continue }
+        $htmlPages++
+        $localReference = $record.file.Replace('\', '/').TrimStart('/')
+        $localPdf = Join-Path $SiteRoot $localReference.Replace('/', '\')
+        $record.file = $githubBase + $localReference
+        if ($directPdfReferences.Contains($localReference) -or -not (Test-Path -LiteralPath $localPdf -PathType Leaf)) { continue }
+        $pdfInfo = Get-Item -LiteralPath $localPdf
+        $omittedPdfBytes += $pdfInfo.Length
+        Remove-Item -LiteralPath $localPdf -Force
+        $omittedPdfs++
+    }
+    Write-Utf8Text -Path $registerPath -Value (($register | ConvertTo-Json -Depth 8) + "`n")
+    return [pscustomobject]@{ HtmlPages = $htmlPages; OmittedPdfs = $omittedPdfs; OmittedPdfBytes = $omittedPdfBytes }
+}
+
 Push-Location $repositoryRoot
 try {
     $branch = (& git branch --show-current).Trim()
@@ -205,6 +249,7 @@ try {
     }
     Write-Utf8Text -Path $notFoundPath -Value $notFound.Replace($githubBase, '<base href="/">')
 
+    $archiveOptimization = Optimize-ResultArchivePackage -SiteRoot $siteRoot
     Test-PackageLinks -SiteRoot $siteRoot
 
     $forbidden = @(Get-ChildItem -LiteralPath $siteRoot -File -Recurse | Where-Object {
@@ -223,6 +268,9 @@ try {
         productionRoot = '/'
         fileCount     = $publicFiles.Count + 1
         contentBytes  = ($publicFiles | Measure-Object -Property Length -Sum).Sum
+        htmlResultPages = $archiveOptimization.HtmlPages
+        omittedArchivePdfs = $archiveOptimization.OmittedPdfs
+        omittedArchivePdfBytes = $archiveOptimization.OmittedPdfBytes
     }
     Write-Utf8Text -Path (Join-Path $siteRoot 'deployment-manifest.json') -Value (($manifest | ConvertTo-Json -Depth 4) + "`n")
 
@@ -249,6 +297,8 @@ try {
     Write-Host "$Channel deployment package created successfully." -ForegroundColor Green
     Write-Host "  Source commit: $shortCommit"
     Write-Host "  Public files:  $($manifest.fileCount)"
+    Write-Host "  HTML results:  $($manifest.htmlResultPages)"
+    Write-Host "  PDFs omitted:  $($manifest.omittedArchivePdfs) ($($manifest.omittedArchivePdfBytes) bytes)"
     Write-Host "  Site folder:   $siteRoot"
     Write-Host "  Upload ZIP:    $zipPath"
     Write-Host ''

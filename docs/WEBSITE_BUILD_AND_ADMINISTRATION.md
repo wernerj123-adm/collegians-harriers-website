@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.3.0 |
-| Website build phase | Development v0.8.0 |
+| Handbook version | 1.3.1 |
+| Website build phase | Development v0.8.1 |
 | Last updated | 28 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -86,6 +86,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/results-library-v054.css` | Published-results register and filters |
 | `assets/css/result-detail-v057.css` | Responsive tables and summary cards for HTML result pages |
 | `assets/css/results-archive-v058.css` | Searchable archive layout, filters and historical result rows |
+| `assets/css/archive-detail-v081.css` | Searchable historical result detail pages and source-table transcripts |
 | `assets/css/photo-library-v060.css` | Weekly photo highlights, archive cards and responsive filters |
 | `assets/js/site.js` | Mobile navigation behaviour |
 | `assets/js/home-gallery-v05.js` | Slideshow rotation, controls, swipe and reduced-motion behaviour |
@@ -106,6 +107,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `Publish Photos.cmd` | User-friendly Windows launcher for weekly photo publishing |
 | `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
 | `scripts/build-time-trial-html.py` | Validates weekly result tables and creates responsive HTML result pages |
+| `scripts/build-archive-html.py` | Audits historical PDFs and creates HTML reading copies when reliable text is available |
 | `scripts/publish-photos.ps1` | Validates, files, registers and optionally publishes photographs |
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
 | `Build Staging Package.cmd` | Creates a checked cPanel staging ZIP without uploading it |
@@ -329,6 +331,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 5. Updated the Events page and The Longest Day page to connect the new collections.
 6. Extended the archive builder so these repository-managed legacy records remain registered during future rebuilds.
 
+### Phase 0.8.1 — Lightweight historical HTML archive
+
+1. Audited all 241 registered historical result PDFs for machine-readable text and tables.
+2. Created searchable HTML reading copies for 226 documents; retained 15 scan or image-based records as PDF-only items.
+3. Kept every approved PDF in the Git repository as the original source and linked it from its HTML reading copy.
+4. Reduced the equivalent cPanel archive payload by approximately 60.5 MB: the 64.6 MB of converted PDFs are represented by about 4.0 MB of HTML.
+5. Updated the cPanel package builder to omit converted archive PDFs that are not directly required by an event page. Original PDFs remain available from the GitHub development archive.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -449,6 +459,8 @@ Paste that address into the File Explorer address bar to open the folder. If the
 | Result HTML pages | `results\YYYY\` | Mobile-friendly result pages, when available |
 | Historical result register | `assets\data\results-archive.json` | Records the approved historical archive |
 | Historical PDFs | `assets\results\archive\YYYY\` | Approved archive files arranged by year and type |
+| Historical HTML builder | `scripts\build-archive-html.py` | Audits PDFs and rebuilds searchable HTML reading copies |
+| Historical HTML pages | `results\archive\YYYY\` | Generated reading copies used as the primary archive links |
 | Photos launcher | `Publish Photos.cmd` | Opens the guided weekly photo uploader |
 | Photo inbox | `photo-inbox\` | Place approved JPG, JPEG or PNG files here before running the launcher |
 | Photo publishing script | `scripts\publish-photos.ps1` | Advanced PowerShell version used by the launcher |
@@ -644,6 +656,17 @@ The PDF is always retained as the approved source. Weekly time trials receive an
 ```
 
 The Results card will then open the HTML page first and show the original PDF as a secondary option. The same arrangement may be used for weekly time trials, race results, championship standings and hosted-event results.
+
+#### Rebuild the historical HTML archive
+
+After adding or reorganising historical PDFs, first rebuild `assets/data/results-archive.json`, then run the HTML builder from the website folder:
+
+```powershell
+.\scripts\build-results-archive.ps1
+py .\scripts\build-archive-html.py
+```
+
+The second command checks every registered PDF, generates pages under `results/archive/YYYY/`, and adds each successful page path to the archive register. A PDF with too little machine-readable text remains PDF-only; do not force a scanned document into an unreliable transcription. Review a sample from each result type before publishing. The source PDFs remain version-controlled even though the smaller cPanel package can omit converted copies.
 
 Use **Time trial** for weekly club results, **Road** or **Trail** for ordinary race results, **Championship** for season logs and standings, and **Hosted event** for results from events organised by Collegians.
 
@@ -845,7 +868,7 @@ The builder prepares a reviewable upload package. It does not sign in to cPanel,
 1. Confirm all intended changes are committed and pushed to `develop`.
 2. Confirm the working tree is clean.
 3. Double-click `Build Staging Package.cmd` in the main website folder.
-4. The builder copies only public HTML, CSS, JavaScript, JSON, images, fonts and PDFs into a new `dist/staging-COMMIT/site/` folder.
+4. The builder copies only public HTML, CSS, JavaScript, JSON, images, fonts and required PDFs into a new `dist/staging-COMMIT/site/` folder. Historical PDFs with verified HTML reading copies are omitted unless another public page links to them directly.
 5. It validates internal HTML and CSS references, result/photo register file paths, blocked administration extensions and required ZIP entries.
 6. It changes the packaged 404 base path to `/`, adds `.htaccess`, and writes `deployment-manifest.json` with the source commit.
 7. If all checks pass, use the ZIP named `dist/collegians-harriers-staging-COMMIT.zip` for the approved staging upload.
