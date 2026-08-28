@@ -889,15 +889,16 @@ If the same commit has already been packaged, the builder stops rather than over
 6. Test navigation, membership links, photo albums, current and archived results, PDF downloads, the mobile menu and a deliberately missing URL.
 7. Do not promote staging to production until the club approves the staging review.
 
-#### Confirmed staging configuration — 27 August 2026
+#### Confirmed staging configuration — 28 August 2026
 
 | Item | Confirmed value |
 |---|---|
 | Staging address | `https://staging.collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
-| Deployed source | `develop` commit `95f28a4b2d2522a5f3b8ac8bdb4581fbc3815148` |
-| Current deployment package | `/home/colletdr/collegians-harriers-staging-95f28a4b.zip` |
-| Previous known-good package | `/home/colletdr/collegians-harriers-staging-6de17300.zip` |
+| Deployed source | `develop` commit `6f64c1a9e39911db0b82070ffa702e2cf419f29c` |
+| Current deployment package | `/home/colletdr/collegians-harriers-staging-6f64c1a9.zip` |
+| Previous known-good package | `/home/colletdr/collegians-harriers-staging-95f28a4b.zip` |
+| Secondary fallback package | `/home/colletdr/collegians-harriers-staging-6de17300.zip` |
 | Pre-deployment backup | `/home/colletdr/staging-predeploy-defaults-20260827.zip` |
 
 The deployment packages and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
@@ -911,7 +912,7 @@ The deployment packages and backup are deliberately stored in `/home/colletdr/`,
 5. Confirm that `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the document root.
 6. Retest the Home page, results, photographs, downloads, mobile menu and a deliberately missing URL.
 
-The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-95f28a4b.zip` package as the current known-good website rollback package; the earlier `collegians-harriers-staging-6de17300.zip` package remains available as a secondary fallback.
+The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-6f64c1a9.zip` package for the current deployed website. The `95f28a4b` package is the immediate known-good rollback, and the earlier `6de17300` package remains available as a secondary fallback.
 
 Never store cPanel passwords, SFTP credentials or private keys in this repository or the deployment ZIP.
 
@@ -1033,6 +1034,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.3.1 — 28 August 2026
+
+- Added the searchable historical HTML conversion procedure and recorded 226 converted documents plus 15 PDF-only scans.
+- Recorded the reduced cPanel package: 217 archive PDFs omitted, approximately 61.4 MB removed from the hosted payload, and a 31.79 MB upload ZIP.
+- Recorded successful staging deployment of `develop` commit `6f64c1a9`, live Home and results validation, and the updated off-root rollback package locations.
 
 ### 1.3.0 — 28 August 2026
 
