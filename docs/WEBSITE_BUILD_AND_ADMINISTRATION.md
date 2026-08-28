@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.2.4 |
-| Website build phase | Development v0.7.3 |
-| Last updated | 27 August 2026 |
+| Handbook version | 1.3.0 |
+| Website build phase | Development v0.8.0 |
+| Last updated | 28 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -59,6 +59,11 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | Club Photos | `photos.html` | Latest weekly activity gallery and searchable permanent photo archive |
 | Contact | `contact.html` | Club location, contact routes and social channels |
 | The Longest Day | `longest-day.html` | Dedicated 2026 event page |
+| uMngeni-uThukela Water Marathon | `umngeni-uthukela-water-marathon.html` | Official 2026 information, flyer, routes, course records and historical results |
+| Duke of York | `duke-of-york.html` | 16 km race history, historical route and result archive |
+| Hogsback Trail Run | `hogsback.html` | Boxing Day trail tradition, photo history and participation archive |
+| Bill Butler Social Run | `bill-butler.html` | Prediction-run format and historical results |
+| Club History | `history.html` | Preserved club and event-history documents |
 | Page not found | `404.html` | Branded recovery page for old, moved or mistyped links |
 
 ### Shared assets
@@ -74,6 +79,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/css/membership-notes.css` | Membership footnote styling |
 | `assets/css/longest-day-v03.css` | The Longest Day page styling |
 | `assets/css/longest-day-flyer-v051.css` | Responsive presentation for the official Longest Day flyer |
+| `assets/css/event-series-v080.css` | Shared layout for hosted-event and history pages |
 | `assets/css/production-v04.css` | Accessibility and production-browser refinements |
 | `assets/css/home-gallery-v05.css` | Landing-page photo slideshow styling |
 | `assets/css/not-found-v053.css` | Branded page-not-found layout |
@@ -91,6 +97,8 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `assets/data/photos.json` | Public register of approved weekly and archived photographs |
 | `assets/results/YYYY/` | Approved result documents organised by year |
 | `assets/results/archive/YYYY/` | Curated historical PDFs organised by season and result type |
+| `assets/events/` | Current event route maps and operational documents |
+| `assets/history/` | Preserved club, event and photographic history PDFs |
 | `results/YYYY/` | Approved HTML result pages organised by year |
 | `results-inbox/` | Local drop folder for approved PDFs awaiting preparation |
 | `photo-inbox/` | Local drop folder for approved JPG and PNG photographs |
@@ -218,7 +226,7 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 ### Phase 0.5.8 — Historical results archive
 
 1. Audited the club Results library and separated public results from drafts, templates, signed forms and administrative documents.
-2. Preserved 219 approved PDFs spanning the available 1997–2026 history.
+2. Preserved 241 approved PDFs spanning the available 1983–2026 history.
 3. Added a searchable archive with year, result-type and text filters.
 4. Added an archive builder that prevents accidental overwriting and regenerates the archive register from the approved source collection.
 5. Verified that every archived PDF opens, contains at least one page and renders correctly.
@@ -312,6 +320,15 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 5. Added a compact numeric position indicator for future registers containing more than ten photographs.
 6. Deployed the validated package to cPanel staging and confirmed six live slides, timed advancement, complete images and a clean browser log.
 
+### Phase 0.8.0 — Hosted-event and history reconstruction
+
+1. Rebuilt the uMngeni-uThukela Water Marathon as a complete 2026 event page using the approved four-page flyer, route maps, event-day information and published course records.
+2. Created dedicated Duke of York, Hogsback Trail Run and Bill Butler Social Run pages, separating historical information from future dates that are not yet confirmed.
+3. Added a club History page for preserved club, Longest Day and Hogsback documents.
+4. Recovered and indexed 22 additional hosted-event result PDFs, including Water Marathon results from 2003 to 2024, Duke of York results from 1983 to 2019 and Longest Day results from 2017 and 2019.
+5. Updated the Events page and The Longest Day page to connect the new collections.
+6. Extended the archive builder so these repository-managed legacy records remain registered during future rebuilds.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -333,6 +350,7 @@ This table links the principal completed changes to their recoverable Git histor
 | `bcb5ab7` | Added accessibility and production-browser polish |
 | `0cfc41d` | Added the Home page club-photography slideshow |
 | `95f28a4` | Connected the Home slideshow to every approved photograph and deployed it to staging |
+| `77e0b15` | Rebuilt hosted-event pages and recovered the historical PDF collections |
 
 ---
 
@@ -982,7 +1000,7 @@ The GitHub repository is the source of truth and provides the version history. P
 
 - Continue converting newly approved results to mobile-friendly HTML while retaining each source PDF.
 - Add a structured document library where required.
-- Expand dedicated pages for major hosted events.
+- Add future event dates and entry links only after the organising committee confirms them.
 - Obtain club approval of the validated cPanel staging site, then promote the approved commit to `main` and build the production package.
 - Consider a simple content-management workflow if nontechnical administrators need to publish frequently.
 - Consider reusable site includes or a static-site generator if repeated navigation and footer maintenance becomes burdensome.
@@ -992,6 +1010,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.3.0 — 28 August 2026
+
+- Documented the reconstructed Water Marathon, Duke of York, Hogsback, Bill Butler and club-history pages.
+- Recorded the recovered route, flyer, photo-history and hosted-event PDF structure.
+- Updated the archive total to 241 approved PDFs and advanced the development build to v0.8.0.
 
 ### 1.2.4 — 27 August 2026
 
