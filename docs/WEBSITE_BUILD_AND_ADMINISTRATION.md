@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.3.2 |
-| Website build phase | Development v0.8.2 |
+| Handbook version | 1.3.3 |
+| Website build phase | Development v0.8.3 |
 | Last updated | 28 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -348,6 +348,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Added support for the historical 1-mile Herman's Dash alongside the 2.8 km, 4.4 km and 7.3 km routes.
 5. Required reconstructed runner rows to match each PDF's printed attendance total exactly. Forty-four incomplete, conflicting or image-only records retain the safer transcript or PDF presentation.
 6. Recorded each archive item's presentation as `structured-time-trial` or `archive-transcript` in the generated archive register.
+
+### Phase 0.8.3 — Newer 2026 result-export support
+
+1. Added a second verified parser for the multi-page browser-export PDFs used from late June 2026.
+2. Rebuilt seven additional 2026 time trials, including all archived results from 30 June through 18 August, in the current structured format.
+3. Increased the modern historical result collection to 137 pages and reduced safe fallbacks to 37.
+4. Preserved the exact route-count validation before any newer export is converted.
+5. Preserved the comparison totals printed in newer exports instead of recalculating them from normalized runner names.
 
 ### Build milestone ledger
 
@@ -1046,6 +1054,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.3.3 — 29 August 2026
+
+- Added the newer multi-page browser-export parser and rebuilt seven additional 2026 time trials.
+- Recorded 137 structured historical time trials with 37 safe fallbacks and preserved source comparison totals.
+- Advanced the development build to v0.8.3.
 
 ### 1.3.2 — 28 August 2026
 

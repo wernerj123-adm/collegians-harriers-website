@@ -25,6 +25,13 @@ COURSE_RE = re.compile(r"(?P<distance>\d+(?:\.\d+)?)\s*Km\s*Course", re.I)
 MILE_RE = re.compile(r"1[- ]?Mile\s+Herman'?s\s+Dash", re.I)
 POSITION_RE = re.compile(r"^(?:Pos|Position)$", re.I)
 TIME_RE = re.compile(r"^(?:\d{1,2}[:.]\d{2}|\d{1,2}[:.]\d{2}[:.]\d{2})$")
+MODERN_ROUTE_RE = re.compile(
+    r"^(?P<distance>\d+(?:\.\d+)?\s*km|1\s*mile)\s+(?P<count>\d+)\s+finishers?$", re.I
+)
+MODERN_ROW_RE = re.compile(
+    r"^(?P<position>\d+)\s+(?P<body>.+?)\s+(?P<time>\d{1,2}:\d{2}(?::\d{2})?)\s+"
+    r"(?P<pace>\d{1,2}:\d{2})$"
+)
 
 
 def clean(value: object) -> str:
@@ -218,6 +225,102 @@ def finalized_routes(routes: dict[str, list[dict[str, str]]]) -> list:
     return parsed_routes
 
 
+def parse_modern_export(text: str) -> list:
+    """Parse the later browser-export result PDFs used during the 2026 season."""
+    lines = [clean(line) for line in text.splitlines()]
+    headings = [(index, MODERN_ROUTE_RE.match(line)) for index, line in enumerate(lines)]
+    headings = [(index, match) for index, match in headings if match]
+    if not headings:
+        return []
+    parsed_routes = []
+    mismatches = []
+    for heading_number, (start, match) in enumerate(headings):
+        end = headings[heading_number + 1][0] if heading_number + 1 < len(headings) else len(lines)
+        raw_distance = re.sub(r"\s+", " ", match.group("distance").lower())
+        distance = "1 mile" if raw_distance == "1 mile" else raw_distance.removesuffix(" km")
+        stated_count = int(match.group("count"))
+        rows = []
+        for line in lines[start + 1 : end]:
+            row_match = MODERN_ROW_RE.match(line)
+            if not row_match:
+                continue
+            body_parts = row_match.group("body").rsplit(" ", 1)
+            if len(body_parts) != 2:
+                continue
+            name, group = body_parts
+            time_value = normalize_time(row_match.group("time"))
+            if not name or not group or not time_value:
+                continue
+            rows.append(
+                {
+                    "position": row_match.group("position"),
+                    "name": name,
+                    "group": group,
+                    "time": time_value,
+                    "pace": pace_for(time_value, distance),
+                }
+            )
+        unique = {(row["position"], row["name"], row["time"]): row for row in rows}
+        ordered = sorted(unique.values(), key=lambda row: int(row["position"]))
+        if len(ordered) != stated_count:
+            mismatches.append(f"{CURRENT.route_label(distance)} says {stated_count} but produced {len(ordered)} rows")
+            continue
+        parsed_routes.append(CURRENT.Route(distance=distance, stated_count=stated_count, rows=ordered))
+    if mismatches:
+        raise ValueError("Modern export row mismatch: " + "; ".join(mismatches) + ".")
+    return parsed_routes
+
+
+def parse_modern_comparison(text: str) -> dict:
+    text = "\n".join(clean(line) for line in text.splitlines())
+    comparison_date = re.search(r"^This week vs (?P<date>\d{4}-\d{2}-\d{2})$", text, re.I | re.M)
+    comparison_rows = []
+    for match in re.finditer(
+        r"^(?P<distance>\d+(?:\.\d+)?)\s*km\s+(?P<this>\d+)\s+(?P<last>\d+)\s+"
+        r"(?P<change>[+-]?\d+)\s+(?P<average>\d{1,2}:\d{2})$",
+        text,
+        re.I | re.M,
+    ):
+        comparison_rows.append(
+            {
+                "distance": match.group("distance"),
+                "this_week": match.group("this"),
+                "last_week": match.group("last"),
+                "change": f"{int(match.group('change')):+d}",
+                "average": match.group("average"),
+            }
+        )
+    total = re.search(
+        r"^Total\s+(?P<this>\d+)\s+(?P<last>\d+)\s+(?P<change>[+-]?\d+)", text, re.I | re.M
+    )
+    performance = re.search(
+        r"Faster:\s*(?P<faster>\d+).*?Slower:\s*(?P<slower>\d+).*?Same:\s*(?P<same>\d+)",
+        text,
+        re.I | re.S,
+    )
+    movement = re.search(
+        r"New this week:\s*(?P<new>\d+).*?Dropped from previous week:\s*(?P<dropped>\d+)",
+        text,
+        re.I | re.S,
+    )
+    if not (comparison_date and comparison_rows and total and performance and movement):
+        return {}
+    return {
+        "comparison_date": datetime.strptime(comparison_date.group("date"), "%Y-%m-%d").strftime("%d %B %Y"),
+        "comparison": comparison_rows,
+        "comparison_total": {
+            "this_week": total.group("this"),
+            "last_week": total.group("last"),
+            "change": f"{int(total.group('change')):+d}",
+        },
+        "faster": int(performance.group("faster")),
+        "slower": int(performance.group("slower")),
+        "same": int(performance.group("same")),
+        "new": int(movement.group("new")),
+        "dropped": int(movement.group("dropped")),
+    }
+
+
 def parse_historical_pdf(pdf_path: Path, result_date: str) -> dict:
     table_routes: dict[str, list[dict[str, str]]] = {}
     word_routes: dict[str, list[dict[str, str]]] = {}
@@ -230,11 +333,20 @@ def parse_historical_pdf(pdf_path: Path, result_date: str) -> dict:
             for table in page.extract_tables() or []:
                 parse_table(table, table_routes)
             parse_word_layout(page, word_routes)
-    candidates = [candidate for candidate in (finalized_routes(table_routes), finalized_routes(word_routes)) if candidate]
+    attendance_text = "\n".join(extracted_text)
+    modern_routes = parse_modern_export(attendance_text)
+    candidates = [
+        candidate
+        for candidate in (
+            modern_routes,
+            finalized_routes(table_routes),
+            finalized_routes(word_routes),
+        )
+        if candidate
+    ]
     if not candidates:
         raise ValueError("No structured route tables were found.")
     parsed_date = datetime.strptime(result_date, "%Y-%m-%d")
-    attendance_text = "\n".join(extracted_text)
     attendance_match = re.search(r"This Week'?s Attendance:\s*(\d+(?:[.,]\d+)?)", attendance_text, re.I)
     attendance = int(float(attendance_match.group(1).replace(",", "."))) if attendance_match else None
     if attendance is not None:
@@ -246,7 +358,7 @@ def parse_historical_pdf(pdf_path: Path, result_date: str) -> dict:
     else:
         parsed_routes = max(candidates, key=lambda candidate: sum(route.stated_count for route in candidate))
     total_finishers = sum(route.stated_count for route in parsed_routes)
-    return {
+    result = {
         "title": "Herman's Delight Weekly Results",
         "event_name": "Herman's Delight",
         "date": parsed_date,
@@ -262,6 +374,9 @@ def parse_historical_pdf(pdf_path: Path, result_date: str) -> dict:
         "total_finishers": total_finishers,
         "note": CURRENT.route_list_label(parsed_routes) + f" - {total_finishers} finishers",
     }
+    if modern_routes:
+        result.update(parse_modern_comparison(attendance_text))
+    return result
 
 
 def normalized_name(value: str) -> str:
@@ -279,6 +394,8 @@ def participant_times(data: dict) -> dict[str, int]:
 
 
 def add_comparison(current: dict, previous: dict | None) -> None:
+    if current.get("comparison"):
+        return
     if previous is None:
         return
     if previous["date"].year != current["date"].year or (current["date"] - previous["date"]).days > 21:
@@ -313,10 +430,10 @@ def add_comparison(current: dict, previous: dict | None) -> None:
     current["dropped"] = len(previous_times.keys() - current_times.keys())
 
 
-def render_historical_html(data: dict, public_title: str, pdf_url: str) -> str:
+def render_historical_html(data: dict, _public_title: str, pdf_url: str) -> str:
     return CURRENT.render_html(
         data,
-        public_title,
+        data["title"],
         pdf_url,
         base_href="../../../",
         back_href="time-trial-results.html",
