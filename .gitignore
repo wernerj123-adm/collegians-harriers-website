@@ -1,0 +1,19 @@
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local development
+node_modules/
+.env
+.env.*
+
+# Build/deployment artifacts
+*.zip
+*.tar.gz
+dist/
+
+# Local result-file drop folder; only its instructions belong in Git
+results-inbox/*
+!results-inbox/README.md

@@ -1,0 +1,84 @@
+/* Official 2026 event flyer presentation. */
+.event-flyer-section {
+  position: relative;
+  z-index: 1;
+  padding: 90px 0;
+  overflow: hidden;
+  background: #111113;
+  color: #fff;
+}
+
+.event-flyer-heading {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 70px;
+  align-items: end;
+  margin-bottom: 36px;
+}
+
+.event-flyer-heading h2 {
+  margin: 18px 0 0;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.event-flyer-heading h2 span {
+  color: var(--red);
+}
+
+.event-flyer-heading p {
+  max-width: 500px;
+  margin: 0 0 5px;
+  color: #bdbdbd;
+}
+
+.event-flyer {
+  margin: 0;
+}
+
+.event-flyer a {
+  display: block;
+  overflow: hidden;
+  border: 1px solid #38383b;
+  border-radius: 20px;
+  background: #000;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.event-flyer a:hover {
+  transform: translateY(-3px);
+  border-color: var(--red);
+}
+
+.event-flyer img {
+  width: 100%;
+  height: auto;
+}
+
+.event-flyer figcaption {
+  margin-top: 15px;
+  color: #9c9c9c;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .event-flyer-section {
+    padding: 70px 0;
+  }
+
+  .event-flyer-heading {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .event-flyer a {
+    border-radius: 14px;
+  }
+}

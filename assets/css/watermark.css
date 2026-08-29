@@ -1,0 +1,29 @@
+/* Subtle fixed club crest watermark across site pages. */
+body::after {
+  content: "";
+  position: fixed;
+  top: 54%;
+  left: 50%;
+  width: clamp(240px, 32vw, 480px);
+  aspect-ratio: 100 / 164;
+  transform: translate(-50%, -50%);
+  background: url("../img/collegians-logo.png?v=20260825d") center / contain no-repeat;
+  opacity: 0.035;
+  pointer-events: none;
+  user-select: none;
+  z-index: 40;
+}
+
+@media (max-width: 760px) {
+  body::after {
+    top: 56%;
+    width: clamp(190px, 58vw, 280px);
+    opacity: 0.03;
+  }
+}
+
+@media print {
+  body::after {
+    display: none;
+  }
+}

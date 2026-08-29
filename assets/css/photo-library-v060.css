@@ -1,0 +1,75 @@
+/* Weekly club activity photos and permanent archive. */
+.photo-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 42px;
+  align-items: end;
+  margin-bottom: 46px;
+}
+
+.photo-intro h2 {
+  margin: 14px 0 12px;
+  font-size: clamp(2.7rem, 6vw, 5rem);
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+}
+
+.photo-intro p { max-width: 720px; margin: 0; color: #5e5a55; }
+.photo-total { min-width: 180px; padding: 22px 26px; border-radius: 18px; background: var(--black); color: #fff; }
+.photo-total small { display: block; color: #aaa; font-size: .68rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.photo-total strong { display: block; margin-top: 6px; font-size: 2.4rem; line-height: 1; }
+
+.photo-featured {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 72px;
+}
+
+.photo-card { overflow: hidden; border: 1px solid #d8d2c8; border-radius: 18px; background: rgba(255,255,255,.9); }
+.photo-card a { display: block; height: 100%; }
+.photo-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #ddd; transition: transform .35s ease; }
+.photo-card:hover img { transform: scale(1.025); }
+.photo-card-featured img { aspect-ratio: 16 / 10; }
+.photo-album-cover { position: relative; overflow: hidden; }
+.photo-album-cover img { display: block; }
+.photo-count { position: absolute; right: 14px; bottom: 14px; padding: 7px 11px; border-radius: 999px; background: rgba(8,8,9,.86); color: #fff; font-size: .72rem; }
+.photo-album-card .photo-card-copy p { color: var(--red); font-weight: 850; }
+.photo-card-copy { padding: 19px 20px 22px; }
+.photo-card-copy span { color: var(--red); font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.photo-card-copy h3 { margin: 7px 0 5px; font-size: 1.25rem; line-height: 1.15; }
+.photo-card-copy p { margin: 0; color: #69645e; font-size: .9rem; }
+
+.photo-archive-head { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin-bottom: 24px; }
+.photo-archive-head h2 { margin: 0; font-size: clamp(2.2rem, 5vw, 4rem); letter-spacing: -.05em; }
+.photo-archive-head p { max-width: 520px; margin: 0; color: #68635d; }
+.photo-tools { display: grid; grid-template-columns: minmax(240px, 1fr) 180px 220px; gap: 12px; padding: 20px; border: 1px solid #d8d2c8; border-radius: 20px; background: rgba(255,255,255,.9); }
+.photo-field label { display: block; margin: 0 0 7px; color: #55514c; font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.photo-field input,.photo-field select { width: 100%; min-height: 46px; padding: 10px 13px; border: 1px solid #cfc8bd; border-radius: 10px; background: #fff; color: var(--black); font: inherit; }
+.photo-status { margin: 18px 0 30px; color: #68635d; font-size: .88rem; }
+.photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.photo-empty { grid-column: 1 / -1; padding: 38px; border: 1px dashed #c8c0b5; border-radius: 16px; text-align: center; }
+.photo-policy { margin-top: 58px; padding: 24px 26px; border-left: 4px solid var(--red); background: #fff; }
+.photo-policy h2 { margin: 0 0 7px; font-size: 1.2rem; }
+.photo-policy p { margin: 0; color: #625e58; }
+.photo-album-view[hidden] { display: none; }
+.photo-album-view { min-height: 50vh; }
+.photo-album-back { display: inline-flex; margin-bottom: 42px; color: var(--red); font-weight: 900; }
+.photo-album-view > h2 { margin: 16px 0 8px; font-size: clamp(2.8rem, 6vw, 5.4rem); line-height: .92; letter-spacing: -.055em; }
+.photo-album-meta { margin: 0 0 34px; color: #68635d; font-size: 1rem; }
+.photo-album-grid { margin-top: 0; }
+.gallery-heading .gallery-archive-link { color: #fff; }
+
+@media (max-width: 800px) {
+  .photo-intro,.photo-tools { grid-template-columns: 1fr; }
+  .photo-archive-head { display: block; }
+  .photo-archive-head p { margin-top: 10px; }
+  .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .photo-featured,.photo-grid { grid-template-columns: 1fr; }
+  .photo-card-featured img { aspect-ratio: 4 / 3; }
+}
+
+@media (prefers-reduced-motion: reduce) { .photo-card img { transition: none; } }

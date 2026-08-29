@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish Collegians Photos"
+  short_description: "Publish approved club photo albums"
+  default_prompt: "Use $collegians-publish-photos to prepare and publish the approved photographs in the photo inbox."
