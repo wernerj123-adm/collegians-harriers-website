@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pdfplumber
 
+from historical_time_trial_html import add_comparison, parse_historical_pdf, render_historical_html
+
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "assets" / "data" / "results-archive.json"
@@ -147,6 +149,28 @@ def main() -> int:
     converted = skipped = failed = 0
     source_bytes = html_bytes = 0
     skip_reasons: dict[str, int] = {}
+    modern_time_trials: dict[str, dict] = {}
+    modern_parse_reasons: dict[str, int] = {}
+    modern_parse_files: list[dict[str, str]] = []
+    previous_time_trial: dict | None = None
+    time_trial_records = sorted(
+        (record for record in data.get("results", []) if record.get("category") == "time-trial"),
+        key=lambda record: record.get("date", ""),
+    )
+    for record in time_trial_records:
+        pdf_path = ROOT / record["file"]
+        if not pdf_path.is_file():
+            continue
+        try:
+            parsed = parse_historical_pdf(pdf_path, record["date"])
+            add_comparison(parsed, previous_time_trial)
+            modern_time_trials[record["file"]] = parsed
+            previous_time_trial = parsed
+        except Exception as exc:
+            reason = str(exc).splitlines()[0]
+            modern_parse_reasons[reason] = modern_parse_reasons.get(reason, 0) + 1
+            modern_parse_files.append({"file": record["file"], "reason": reason})
+
     for index, record in enumerate(data.get("results", []), start=1):
         if args.category and record.get("category") not in args.category:
             continue
@@ -154,6 +178,23 @@ def main() -> int:
         if not pdf_path.is_file():
             failed += 1
             skip_reasons["missing PDF"] = skip_reasons.get("missing PDF", 0) + 1
+            continue
+        if record["file"] in modern_time_trials:
+            converted += 1
+            source_bytes += pdf_path.stat().st_size
+            if not args.audit:
+                destination = output_path(record)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                rendered = render_historical_html(
+                    modern_time_trials[record["file"]], record["title"], PUBLIC_PDF_ROOT + record["file"]
+                )
+                destination.write_text(rendered, encoding="utf-8", newline="\n")
+                html_bytes += destination.stat().st_size
+                record["page"] = web_path(record)
+                record["htmlFormat"] = "HTML"
+                record["pageStyle"] = "structured-time-trial"
+            if index % 25 == 0:
+                print(f"Reviewed {index} records...", file=sys.stderr)
             continue
         try:
             pages, characters = extract_pdf(pdf_path)
@@ -167,6 +208,7 @@ def main() -> int:
             skip_reasons["scan or insufficient text"] = skip_reasons.get("scan or insufficient text", 0) + 1
             record.pop("page", None)
             record.pop("htmlFormat", None)
+            record.pop("pageStyle", None)
             continue
         converted += 1
         source_bytes += pdf_path.stat().st_size
@@ -178,6 +220,7 @@ def main() -> int:
             html_bytes += destination.stat().st_size
             record["page"] = web_path(record)
             record["htmlFormat"] = "HTML"
+            record["pageStyle"] = "archive-transcript"
         if index % 25 == 0:
             print(f"Reviewed {index} records...", file=sys.stderr)
 
@@ -190,6 +233,10 @@ def main() -> int:
         "sourcePdfBytes": source_bytes,
         "htmlBytes": html_bytes,
         "estimatedSavedBytes": max(source_bytes - html_bytes, 0),
+        "modernTimeTrials": len(modern_time_trials),
+        "modernTimeTrialFallbacks": len(time_trial_records) - len(modern_time_trials),
+        "modernParseReasons": modern_parse_reasons,
+        "modernFallbackFiles": modern_parse_files,
         "skipReasons": skip_reasons,
         "mode": "audit" if args.audit else "build",
     }

@@ -149,7 +149,22 @@ def e(value: object) -> str:
     return html.escape(str(value), quote=True)
 
 
+def route_label(distance: str) -> str:
+    return distance if re.search(r"[A-Za-z]", distance) else f"{distance} km"
+
+
+def route_list_label(routes: list[Route]) -> str:
+    labels = [route_label(route.distance) for route in routes]
+    if len(labels) <= 1:
+        return "".join(labels)
+    if len(labels) == 2:
+        return " and ".join(labels)
+    return ", ".join(labels[:-1]) + f", and {labels[-1]}"
+
+
 def render_route(route: Route, index: int) -> str:
+    label = route_label(route.distance)
+    finisher_label = "finisher" if route.stated_count == 1 else "finishers"
     rows = "\n".join(
         "<tr>"
         f'<td class="numeric">{e(row["position"])}</td>'
@@ -161,10 +176,10 @@ def render_route(route: Route, index: int) -> str:
         for row in route.rows
     )
     return f"""<section class="result-section" aria-labelledby="route-{index}-title">
-<div class="result-section-head"><h2 id="route-{index}-title">{e(route.distance)} km.</h2><p>{route.stated_count} finishers &middot; Average time {e(average_time(route.rows))}</p></div>
+<div class="result-section-head"><h2 id="route-{index}-title">{e(label)}.</h2><p>{route.stated_count} {finisher_label} &middot; Average time {e(average_time(route.rows))}</p></div>
 <div class="result-table-wrap">
 <table class="result-table">
-<caption>{e(route.distance)} kilometre results with {route.stated_count} finishers</caption>
+<caption>{e(label)} results with {route.stated_count} {finisher_label}</caption>
 <thead><tr><th scope="col">Pos</th><th scope="col">Name</th><th scope="col">J/W/L</th><th scope="col">Time</th><th scope="col">Pace (min/km)</th></tr></thead>
 <tbody>
 {rows}
@@ -178,7 +193,7 @@ def render_comparison(data: dict) -> str:
     if not data["comparison"]:
         return ""
     rows = "\n".join(
-        f'<tr><th scope="row">{e(item["distance"])} km</th>'
+        f'<tr><th scope="row">{e(route_label(item["distance"]))}</th>'
         f'<td class="numeric">{e(item["this_week"])}</td>'
         f'<td class="numeric">{e(item["last_week"])}</td>'
         f'<td class="numeric">{e(item["change"])}</td>'
@@ -212,10 +227,17 @@ def render_comparison(data: dict) -> str:
 </section>"""
 
 
-def render_html(data: dict, public_title: str, pdf_web_path: str) -> str:
+def render_html(
+    data: dict,
+    public_title: str,
+    pdf_web_path: str,
+    base_href: str = "../../",
+    back_href: str = "results.html",
+    back_label: str = "Back to all results",
+) -> str:
     date: datetime = data["date"]
     month_day = date.strftime("%d %B").lstrip("0").upper()
-    distances = " and ".join(f"{route.distance} km" for route in data["routes"])
+    distances = route_list_label(data["routes"])
     route_sections = "\n\n".join(render_route(route, index + 1) for index, route in enumerate(data["routes"]))
     comparison = render_comparison(data)
     stats = [
@@ -241,7 +263,7 @@ def render_html(data: dict, public_title: str, pdf_web_path: str) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<base href="../../">
+<base href="{e(base_href)}">
 <meta name="description" content="{e(description)}">
 <title>{e(public_title)} - {date.strftime('%d %B %Y')} | Collegians Harriers</title>
 <link rel="stylesheet" href="assets/css/site.css?v=20260825d">
@@ -277,7 +299,7 @@ def render_html(data: dict, public_title: str, pdf_web_path: str) -> str:
 <div class="result-summary" aria-label="Weekly result summary">{stat_html}</div>
 {comparison}
 {route_sections}
-<div class="result-footer-actions"><a class="btn" href="results.html">Back to all results</a><a class="btn secondary" href="{e(pdf_web_path)}" target="_blank" rel="noopener noreferrer">Original PDF</a></div>
+<div class="result-footer-actions"><a class="btn" href="{e(back_href)}">{e(back_label)}</a><a class="btn secondary" href="{e(pdf_web_path)}" target="_blank" rel="noopener noreferrer">Original PDF</a></div>
 </div></section>
 </main>
 <footer><div class="wrap"><div class="footer-grid">

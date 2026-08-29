@@ -4,8 +4,8 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.3.1 |
-| Website build phase | Development v0.8.1 |
+| Handbook version | 1.3.2 |
+| Website build phase | Development v0.8.2 |
 | Last updated | 28 August 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
@@ -107,6 +107,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `Publish Photos.cmd` | User-friendly Windows launcher for weekly photo publishing |
 | `scripts/publish-results.ps1` | Validates, files, registers and optionally publishes results |
 | `scripts/build-time-trial-html.py` | Validates weekly result tables and creates responsive HTML result pages |
+| `scripts/historical_time_trial_html.py` | Reconstructs legacy Herman's Delight tables and validates them against printed attendance totals |
 | `scripts/build-archive-html.py` | Audits historical PDFs and creates HTML reading copies when reliable text is available |
 | `scripts/publish-photos.ps1` | Validates, files, registers and optionally publishes photographs |
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
@@ -338,6 +339,15 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Kept every approved PDF in the Git repository as the original source and linked it from its HTML reading copy.
 4. Reduced the equivalent cPanel archive payload by approximately 60.5 MB: the 64.6 MB of converted PDFs are represented by about 4.0 MB of HTML.
 5. Updated the cPanel package builder to omit converted archive PDFs that are not directly required by an event page. Original PDFs remain available from the GitHub development archive.
+
+### Phase 0.8.2 — Structured historical time-trial pages
+
+1. Rebuilt 130 verified Herman's Delight archive records in the same responsive format as the current weekly result page.
+2. Added the current result hero, attendance summary, route-by-route tables, calculated pace and original-PDF link to each reconstructed page.
+3. Added week-on-week participation and runner comparisons when the previous verified result is from the same season and no more than 21 days earlier.
+4. Added support for the historical 1-mile Herman's Dash alongside the 2.8 km, 4.4 km and 7.3 km routes.
+5. Required reconstructed runner rows to match each PDF's printed attendance total exactly. Forty-four incomplete, conflicting or image-only records retain the safer transcript or PDF presentation.
+6. Recorded each archive item's presentation as `structured-time-trial` or `archive-transcript` in the generated archive register.
 
 ### Build milestone ledger
 
@@ -666,7 +676,9 @@ After adding or reorganising historical PDFs, first rebuild `assets/data/results
 py .\scripts\build-archive-html.py
 ```
 
-The second command checks every registered PDF, generates pages under `results/archive/YYYY/`, and adds each successful page path to the archive register. A PDF with too little machine-readable text remains PDF-only; do not force a scanned document into an unreliable transcription. Review a sample from each result type before publishing. The source PDFs remain version-controlled even though the smaller cPanel package can omit converted copies.
+The second command checks every registered PDF, generates pages under `results/archive/YYYY/`, and adds each successful page path to the archive register. Historical Herman's Delight files are first considered for the current structured time-trial presentation. The builder reconstructs each route table, calculates pace, and publishes the modern page only when the reconstructed runner count matches the attendance total printed in the PDF exactly. When a previous verified result is available from the same year within 21 days, it also creates the week-on-week comparison.
+
+A time-trial file with missing rows, conflicting totals or no reliable route table keeps the safer searchable transcript or PDF-only presentation. A PDF with too little machine-readable text remains PDF-only; do not force a scanned document into an unreliable transcription. Review a sample from each result type before publishing. The source PDFs remain version-controlled even though the smaller cPanel package can omit converted copies.
 
 Use **Time trial** for weekly club results, **Road** or **Trail** for ordinary race results, **Championship** for season logs and standings, and **Hosted event** for results from events organised by Collegians.
 
@@ -1034,6 +1046,12 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.3.2 — 28 August 2026
+
+- Documented the structured reconstruction of 130 verified historical Herman's Delight results.
+- Recorded the exact attendance-validation rule, historical route support, comparisons and safe fallback behaviour.
+- Advanced the development build to v0.8.2.
 
 ### 1.3.1 — 28 August 2026
 
