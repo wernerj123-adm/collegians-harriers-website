@@ -364,6 +364,7 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 3. Corrected every current-register PDF path to the preserved source under `assets/results/archive/2026/time-trial/` and added the verified routes and finisher totals.
 4. Replaced the duplicate `results/2026/` pages with compatibility redirects so old bookmarks continue to work.
 5. Added canonical-path deduplication when current and archive registers are combined on public result-library pages.
+6. Updated the lightweight cPanel package builder to rewrite matching current-register archive PDFs to their GitHub source URLs before omitted-PDF validation.
 
 ### Build milestone ledger
 

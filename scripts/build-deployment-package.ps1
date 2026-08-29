@@ -191,6 +191,19 @@ function Optimize-ResultArchivePackage {
         $omittedPdfs++
     }
     Write-Utf8Text -Path $registerPath -Value (($register | ConvertTo-Json -Depth 8) + "`n")
+
+    $currentRegisterPath = Join-Path $SiteRoot 'assets\data\results.json'
+    if (Test-Path -LiteralPath $currentRegisterPath -PathType Leaf) {
+        $currentRegister = Get-Content -Raw -LiteralPath $currentRegisterPath | ConvertFrom-Json
+        foreach ($record in $currentRegister.results) {
+            if ([string]::IsNullOrWhiteSpace($record.page) -or [string]::IsNullOrWhiteSpace($record.file)) { continue }
+            $localReference = $record.file.Replace('\', '/').TrimStart('/')
+            if (-not $localReference.StartsWith('assets/results/archive/', [System.StringComparison]::OrdinalIgnoreCase)) { continue }
+            $record.file = $githubBase + $localReference
+        }
+        Write-Utf8Text -Path $currentRegisterPath -Value (($currentRegister | ConvertTo-Json -Depth 8) + "`n")
+    }
+
     return [pscustomobject]@{ HtmlPages = $htmlPages; OmittedPdfs = $omittedPdfs; OmittedPdfBytes = $omittedPdfBytes }
 }
 
