@@ -104,9 +104,19 @@
     return response.json();
   });
 
+  const deduplicateResults = (items) => {
+    const unique = new Map();
+    items.forEach((record) => {
+      if (!record || !record.date || !record.category) return;
+      const key = record.page || record.file;
+      if (!unique.has(key)) unique.set(key, record);
+    });
+    return [...unique.values()];
+  };
+
   Promise.all([loadRegister(source), currentSource ? loadRegister(currentSource) : Promise.resolve({ results: [] })])
     .then(([archiveData, currentData]) => {
-      records = [...(currentData.results || []), ...(archiveData.results || [])]
+      records = deduplicateResults([...(currentData.results || []), ...(archiveData.results || [])])
         .filter((record) => record && record.title && record.date && record.season && record.category && (record.file || record.page))
         .filter((record) => !allowedCategories.length || allowedCategories.includes(record.category))
         .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));

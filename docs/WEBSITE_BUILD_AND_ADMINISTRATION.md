@@ -357,6 +357,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Preserved the exact route-count validation before any newer export is converted.
 5. Preserved the comparison totals printed in newer exports instead of recalculating them from normalized runner names.
 
+### Phase 0.8.4 — Current and archive result reconciliation
+
+1. Reconciled seven June-August 2026 time trials that had been registered a second time as current results.
+2. Kept the verified modern page under `results/archive/2026/` as the single canonical HTML result for each date.
+3. Corrected every current-register PDF path to the preserved source under `assets/results/archive/2026/time-trial/` and added the verified routes and finisher totals.
+4. Replaced the duplicate `results/2026/` pages with compatibility redirects so old bookmarks continue to work.
+5. Added canonical-path deduplication when current and archive registers are combined on public result-library pages.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -738,7 +746,7 @@ If a result is corrected later, update both the approved PDF and its existing HT
 
 #### Maintain the historical archive
 
-The archive is deliberately separate from the current-results register. Current publications continue to use `assets/data/results.json`; the historical library uses `assets/data/results-archive.json`.
+The archive is deliberately separate from the current-results register. Current publications continue to use `assets/data/results.json`; the historical library uses `assets/data/results-archive.json`. A result may remain in the current register while its canonical HTML page and preserved PDF live in the archive. When the public library combines both registers, it displays a shared canonical page only once, with the current register taking priority.
 
 1. Keep the club's master result PDFs in the OneDrive `Collegians\Results` structure.
 2. Confirm that each document is intended for public use. Do not include blank templates, witness sheets, drafts, signed forms, entry registers or administration documents.
@@ -763,6 +771,8 @@ The same register automatically feeds the public subject pages:
 
 - `time-trial-results.html` shows the `time-trial` records and merges in current publications from `assets/data/results.json`.
 - `race-event-results.html` shows `hosted-event`, `road`, `trail` and `championship` records.
+
+If the same category and date occur in both registers, ensure the current record points to the same canonical `page` and `file` as the archive record. Do not maintain a second full HTML page. If an older public URL already exists, leave a small redirect page at that path so saved links continue to reach the canonical result.
 
 After rebuilding the archive, test both subject pages as well as the complete archive. No manual HTML list needs to be maintained.
 
