@@ -4,16 +4,17 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.3.3 |
-| Website build phase | Development v0.8.3 |
-| Last updated | 28 August 2026 |
+| Handbook version | 1.4.0 |
+| Website build phase | Production v1.0.0 |
+| Last updated | 17 September 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
 | Repository | <https://github.com/wernerj123-adm/collegians-harriers-website> |
 | Confirmed staging site | <https://staging.collegiansharriers.co.za/> |
 | Confirmed staging document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
-| Planned production destination | Collegians Harriers cPanel hosting |
+| Live production site | <https://collegiansharriers.co.za/> |
+| Confirmed production document root | `/home/colletdr/public_html/` |
 
 This is the living operating manual for the Collegians Harriers website. It records what has been built, explains how the site works, and gives future administrators safe, repeatable instructions for keeping it current.
 
@@ -366,6 +367,22 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 5. Added canonical-path deduplication when current and archive registers are combined on public result-library pages.
 6. Updated the lightweight cPanel package builder to rewrite matching current-register archive PDFs to their GitHub source URLs before omitted-PDF validation.
 
+### Phase 0.9.0 — Portal-published content brought under version control
+
+1. Found three pages that the portal had written straight into the staging document root and that Git had never tracked: the 2026 Club Championship standings page, its filter script, and the 1 and 8 September time-trial results.
+2. Established that packages built from `develop` therefore omitted content the club had already accepted on staging.
+3. Tracked all three in `develop` and registered them in `assets/data/results.json`, matching the entries staging already published.
+4. Corrected the two time-trial pages, whose `<base href>` pointed at the staging domain and would have sent every link and asset on them back to staging once live.
+5. Fixed the portal renderer that produced that base path so future pages carry a relative one.
+
+### Phase 1.0.0 — First production deployment
+
+1. Promoted the accepted `develop` commit to `main` as a fast-forward, so the released commit is exactly the one reviewed on staging.
+2. Redeployed staging from the tracked package and confirmed it served the same bytes the package contained.
+3. Backed up the previous live website, moved its files out of the document root, and deployed the validated production package to `/home/colletdr/public_html/`.
+4. Verified the live manifest, twenty pages, the branded 404, security headers, result registers, championship filtering and mobile layout.
+5. Added a canonical-host redirect so `www` addresses resolve to the single published hostname.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -388,6 +405,8 @@ This table links the principal completed changes to their recoverable Git histor
 | `0cfc41d` | Added the Home page club-photography slideshow |
 | `95f28a4` | Connected the Home slideshow to every approved photograph and deployed it to staging |
 | `77e0b15` | Rebuilt hosted-event pages and recovered the historical PDF collections |
+| `0de9ec5` | Tracked the 2026 Club Championship standings page and its filter script |
+| `eadcf5b` | Tracked the 1 and 8 September time-trial result pages and corrected their base path |
 
 ---
 
@@ -920,16 +939,16 @@ If the same commit has already been packaged, the builder stops rather than over
 6. Test navigation, membership links, photo albums, current and archived results, PDF downloads, the mobile menu and a deliberately missing URL.
 7. Do not promote staging to production until the club approves the staging review.
 
-#### Confirmed staging configuration — 28 August 2026
+#### Confirmed staging configuration — 17 September 2026
 
 | Item | Confirmed value |
 |---|---|
 | Staging address | `https://staging.collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
-| Deployed source | `develop` commit `6f64c1a9e39911db0b82070ffa702e2cf419f29c` |
-| Current deployment package | `/home/colletdr/collegians-harriers-staging-6f64c1a9.zip` |
-| Previous known-good package | `/home/colletdr/collegians-harriers-staging-95f28a4b.zip` |
-| Secondary fallback package | `/home/colletdr/collegians-harriers-staging-6de17300.zip` |
+| Deployed source | `develop` commit `eadcf5bd55c518fd1df2d1e75348c11b82cbc703` |
+| Current deployment package | `/home/colletdr/collegians-harriers-staging-eadcf5bd.zip` |
+| Previous known-good package | `/home/colletdr/collegians-harriers-staging-6f64c1a9.zip` |
+| Secondary fallback package | `/home/colletdr/collegians-harriers-staging-95f28a4b.zip` |
 | Pre-deployment backup | `/home/colletdr/staging-predeploy-defaults-20260827.zip` |
 
 The deployment packages and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
@@ -943,7 +962,7 @@ The deployment packages and backup are deliberately stored in `/home/colletdr/`,
 5. Confirm that `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the document root.
 6. Retest the Home page, results, photographs, downloads, mobile menu and a deliberately missing URL.
 
-The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-6f64c1a9.zip` package for the current deployed website. The `95f28a4b` package is the immediate known-good rollback, and the earlier `6de17300` package remains available as a secondary fallback.
+The small `staging-predeploy-defaults-20260827.zip` archive restores only the hosting provider's original placeholder files. Use the retained `collegians-harriers-staging-eadcf5bd.zip` package for the current deployed website. The `6f64c1a9` package is the immediate known-good rollback, and the earlier `95f28a4b` package remains available as a secondary fallback.
 
 Never store cPanel passwords, SFTP credentials or private keys in this repository or the deployment ZIP.
 
@@ -956,6 +975,41 @@ Production packages are allowed only from a clean `main` branch after an approve
 ```
 
 Record the previous production commit before uploading so rollback remains possible. The same validation and folder-placement rules used for staging apply to production.
+
+#### Upload to cPanel production
+
+1. Confirm the production document root with the hosting administrator before touching anything.
+2. Back up the current live site: compress the whole of `/home/colletdr/public_html/` into a dated ZIP stored in `/home/colletdr/`, outside the public web root.
+3. Check `public_html` for files that are not part of the website and must survive the replacement: `.well-known/` (certificate validation), `cgi-bin/`, mail autoconfiguration files, `php.ini` or `.user.ini`, and any folder another application serves from. Read the existing `.htaccess` before it is replaced; it may hold redirects or hosting rules that are not in `deployment/production.htaccess`.
+4. Move the previous site's files out of `public_html` into a dated folder in `/home/colletdr/` rather than deleting them. Leaving them in place would keep stale pages reachable at their old addresses.
+5. Upload the ZIP to `/home/colletdr/`, not into the web root, and extract it with `/home/colletdr/public_html` as the destination. The archive has no wrapping folder, so `index.html`, `.htaccess`, `assets/` and `results/` land directly in the document root.
+6. Enable "Show Hidden Files" in File Manager and confirm `.htaccess` extracted. Without it the 404 page, security headers and compression rules are inactive.
+7. Open `deployment-manifest.json` on the live site and confirm its channel is `production` and its commit matches the approved package.
+8. Verify the live site: navigation, membership links, photographs, current and archived results, PDF downloads, the mobile menu, a deliberately missing URL, and the `http` to `https` redirect.
+
+#### Confirmed production configuration — 17 September 2026
+
+| Item | Confirmed value |
+|---|---|
+| Live address | `https://collegiansharriers.co.za/` |
+| cPanel document root | `/home/colletdr/public_html/` |
+| Deployed source | `main` commit `eadcf5bd55c518fd1df2d1e75348c11b82cbc703` |
+| Current deployment package | `/home/colletdr/collegians-harriers-production-eadcf5bd.zip` |
+| Pre-deployment backup | `/home/colletdr/public_html_17_09_2026.zip` |
+| Committee acceptance | Nikki Jonas and Kevin Cameron, recorded 17 September 2026 |
+
+The first production release was verified against the built package: the live manifest, ten spot-checked files byte for byte, all twenty pages, the branded 404, the active security headers, and the absence of any staging hostname in published pages.
+
+#### Production rollback procedure
+
+1. In cPanel File Manager, confirm the current folder is exactly `/home/colletdr/public_html/`.
+2. Compress the current contents into a new dated ZIP in `/home/colletdr/` before changing anything, whatever state the site is in.
+3. Move the failed release's files out of `public_html`. Do not alter the staging or portal document roots.
+4. Extract `public_html_17_09_2026.zip` to restore the previous website, or an earlier production package to return to a known-good release of the current site.
+5. Confirm `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the document root, with hidden files shown.
+6. Retest the Home page, results, photographs, downloads, the mobile menu and a deliberately missing URL.
+
+`public_html_17_09_2026.zip` is the only copy of the website that preceded this release. Keep it until the club is satisfied the new site is correct.
 
 ---
 
@@ -1056,7 +1110,8 @@ The GitHub repository is the source of truth and provides the version history. P
 - Continue converting newly approved results to mobile-friendly HTML while retaining each source PDF.
 - Add a structured document library where required.
 - Add future event dates and entry links only after the organising committee confirms them.
-- Obtain club approval of the validated cPanel staging site, then promote the approved commit to `main` and build the production package.
+- Move portal time-trial publishing onto the repository review path so published pages reach `develop` instead of being written straight into a document root. Until then, copy anything the portal publishes into Git before building a release package, or the next upload will remove it.
+- Add redirects for any addresses from the previous website that visitors may still hold.
 - Consider a simple content-management workflow if nontechnical administrators need to publish frequently.
 - Consider reusable site includes or a static-site generator if repeated navigation and footer maintenance becomes burdensome.
 
@@ -1065,6 +1120,14 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.4.0 — 17 September 2026
+
+- Recorded the first production deployment, its confirmed configuration and its rollback procedure.
+- Added the cPanel production upload procedure, including backing up and clearing the previous website.
+- Corrected the staging deployment record, which still named the superseded `6f64c1a9` package.
+- Documented the portal-published pages that were brought under version control before release.
+- Advanced the build to Production v1.0.0.
 
 ### 1.3.3 — 29 August 2026
 
