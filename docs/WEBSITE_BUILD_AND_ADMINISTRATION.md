@@ -114,6 +114,7 @@ The website is a static site. Each page is an HTML file, styling is stored in CS
 | `scripts/build-results-archive.ps1` | Curates and verifies the historical result collection without overwriting published files |
 | `Build Staging Package.cmd` | Creates a checked cPanel staging ZIP without uploading it |
 | `scripts/build-deployment-package.ps1` | Builds staging or production packages from the approved Git branch |
+| `scripts/check-published-drift.ps1` | Reports anything published on a live site that the repository does not track |
 | `deployment/production.htaccess` | Apache configuration copied into cPanel deployment packages |
 | `.agents/skills/collegians-publish-results/SKILL.md` | Codex workflow for safe current-result publication and verification |
 | `.agents/skills/collegians-publish-photos/SKILL.md` | Codex workflow for approved photo-album publication and verification |
@@ -966,6 +967,22 @@ The small `staging-predeploy-defaults-20260827.zip` archive restores only the ho
 
 Never store cPanel passwords, SFTP credentials or private keys in this repository or the deployment ZIP.
 
+#### Check a published site for drift
+
+The portal publishes some pages by writing them straight into a document root, so a live site can hold content the repository has never seen. A deployment package replaces the result register and the whole `results/` tree, so anything published that way is removed the next time a package is extracted.
+
+Run this before building any release package:
+
+```powershell
+.\scripts\check-published-drift.ps1 -Channel staging
+```
+
+It reads the site's deployment manifest and result register, compares them with the committed register at `HEAD`, and reports pages that are published but untracked, tracked but unpublished, or served with content that differs from the built package. Pass `-Channel production` for the live site, `-Ref <commit>` to compare against a specific commit, and `-Site <url>` for an address other than the two confirmed ones. It exits non-zero when it finds drift, so it can gate a release.
+
+Page content is compared only when the built package for the deployed commit is still in `dist\`. Published pages are not identical to their sources, because the builder rewrites the 404 base path and archive references while packaging.
+
+Bring anything it reports into the repository before releasing. Pages published by the portal carry generated filenames, so copy the published file rather than trying to reproduce its name, and add its register entry to match what the site already serves.
+
 #### Build a production package
 
 Production packages are allowed only from a clean `main` branch after an approved promotion from `develop`:
@@ -1123,6 +1140,7 @@ These are planned items, not completed features.
 
 ### 1.4.0 — 17 September 2026
 
+- Added a published-site drift check and the procedure for running it before a release.
 - Recorded the first production deployment, its confirmed configuration and its rollback procedure.
 - Added the cPanel production upload procedure, including backing up and clearing the previous website.
 - Corrected the staging deployment record, which still named the superseded `6f64c1a9` package.
