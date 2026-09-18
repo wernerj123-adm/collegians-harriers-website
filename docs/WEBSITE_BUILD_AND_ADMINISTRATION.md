@@ -983,6 +983,17 @@ Page content is compared only when the built package for the deployed commit is 
 
 Bring anything it reports into the repository before releasing. Pages published by the portal carry generated filenames, so copy the published file rather than trying to reproduce its name, and add its register entry to match what the site already serves.
 
+#### Promote an accepted release to main
+
+`main` is protected. Every change reaches it through a pull request, and the rule applies to administrators too, so nothing can push to it directly: not a person, not a script, and not the portal's publishing credential, which acts with the account owner's rights. Force-pushes and deletion are blocked.
+
+1. Confirm the club has accepted the staging site and that staging's `deployment-manifest.json` names the `develop` commit being promoted.
+2. Open a pull request from `develop` to `main`. Record who accepted the release and when, and the accepted commit.
+3. Merge it with **Create a merge commit**. Do not use rebase or squash: both rewrite the accepted commits, so `main` would no longer contain the exact commits reviewed on staging.
+4. The production manifest then names the merge commit. Its content is identical to the accepted `develop` commit, which is the merge commit's second parent.
+
+The first production release was promoted by pushing `main` forward directly, before this protection existed. Releases from 17 September 2026 onward use the pull request.
+
 #### Build a production package
 
 Production packages are allowed only from a clean `main` branch after an approved promotion from `develop`:
@@ -1140,6 +1151,7 @@ These are planned items, not completed features.
 
 ### 1.4.0 — 17 September 2026
 
+- Protected `main`: pull requests only, enforced for administrators, no force-push or deletion. Documented promotion by merge commit.
 - Added a published-site drift check and the procedure for running it before a release.
 - Recorded the first production deployment, its confirmed configuration and its rollback procedure.
 - Added the cPanel production upload procedure, including backing up and clearing the previous website.
