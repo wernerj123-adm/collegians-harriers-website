@@ -1,0 +1,77 @@
+# Builds the staging package from develop and uploads it to the staging site.
+#
+# Runs on every push to develop, including merged portal review requests and
+# Publish Results.cmd. It uses the same package builder and checks as a manual
+# release, uploads only files that changed, then runs the drift check against
+# the live staging site. Nothing reaches the public site from here: production
+# still needs a reviewed pull request into main.
+#
+# Needs two repository secrets for an FTP account whose home directory is the
+# staging document root, /home/colletdr/staging.collegiansharriers.co.za:
+#   STAGING_FTP_USERNAME and STAGING_FTP_PASSWORD
+# Until both exist, the package is still built and checked, but not uploaded.
+
+name: Deploy staging
+
+on:
+  push:
+    branches: [develop]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'List what would be uploaded without changing the staging site'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # The package builder uses Windows paths, as it does on the maintainer's PC.
+    runs-on: windows-latest
+    env:
+      CONNECTED: ${{ secrets.STAGING_FTP_USERNAME != '' && secrets.STAGING_FTP_PASSWORD != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build and validate the staging package
+        id: build
+        shell: pwsh
+        run: |
+          .\scripts\build-deployment-package.ps1 -Channel staging
+          $commit = (git rev-parse --short=8 HEAD).Trim()
+          "site=dist/staging-$commit/site/" >> $env:GITHUB_OUTPUT
+
+      - name: Upload changed files to staging
+        if: env.CONNECTED == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: eivor.aserv.co.za
+          port: 21
+          protocol: ftps
+          # The server's certificate is valid for this host name, so insist on it.
+          security: strict
+          username: ${{ secrets.STAGING_FTP_USERNAME }}
+          password: ${{ secrets.STAGING_FTP_PASSWORD }}
+          local-dir: ${{ steps.build.outputs.site }}
+          server-dir: ./
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+
+      - name: Confirm staging matches Git
+        if: env.CONNECTED == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.dry-run)
+        shell: pwsh
+        run: .\scripts\check-published-drift.ps1 -Channel staging
+
+      - name: Note that uploading is not connected yet
+        if: env.CONNECTED != 'true'
+        shell: pwsh
+        run: |
+          "::notice::Package built and validated. Not uploaded: add the STAGING_FTP_USERNAME and STAGING_FTP_PASSWORD secrets to connect staging."
