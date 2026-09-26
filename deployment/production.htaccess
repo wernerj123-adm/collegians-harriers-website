@@ -3,6 +3,12 @@ Options -Indexes
 
 ErrorDocument 404 /404.html
 
+# The automated deployment keeps a record of uploaded files in the site root.
+# It is not public content, so answer requests for it as if it did not exist.
+<IfModule mod_alias.c>
+  RedirectMatch 404 "/\.ftp-deploy-sync-state\.json$"
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   # Serve one canonical hostname: send www.<host> to <host>, keeping the path.

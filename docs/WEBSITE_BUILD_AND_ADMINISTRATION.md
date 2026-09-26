@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.4.0 |
-| Website build phase | Production v1.0.0 |
-| Last updated | 17 September 2026 |
+| Handbook version | 1.5.0 |
+| Website build phase | Production v1.0.1 |
+| Last updated | 18 September 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -384,6 +384,14 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Verified the live manifest, twenty pages, the branded 404, security headers, result registers, championship filtering and mobile layout.
 5. Added a canonical-host redirect so `www` addresses resolve to the single published hostname.
 
+### Phase 1.0.1 — First portal-published results
+
+1. Published the 15 September 2026 Herman's Delight results from the portal as review request #3, the first week to reach the website without files being copied by hand.
+2. Confirmed the request changed exactly the result page and the register, and validated it with the package builder before merging.
+3. Deployed it to staging and confirmed a clean drift check: 12 register entries published and tracked.
+4. Promoted it to `main` by pull request #5 with a merge commit, and deployed a production package identical to the staged site apart from its manifest.
+5. Confirmed a clean drift check against production and verified the page, the results register, the `www` redirect and the security headers on the live site.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -408,6 +416,8 @@ This table links the principal completed changes to their recoverable Git histor
 | `77e0b15` | Rebuilt hosted-event pages and recovered the historical PDF collections |
 | `0de9ec5` | Tracked the 2026 Club Championship standings page and its filter script |
 | `eadcf5b` | Tracked the 1 and 8 September time-trial result pages and corrected their base path |
+| `1232c47` | Merged the first portal-published week, 15 September 2026 |
+| `c529158` | Promoted the 15 September results to `main` for the live site |
 
 ---
 
@@ -674,7 +684,20 @@ Alternative text should briefly describe what is visible and useful, not repeat 
 
 Only publish a final, checked result file. Confirm names, categories, times, positions, dates and any corrections before upload.
 
-#### Recommended: guided inbox publisher
+#### Weekly time trials captured in the portal
+
+Weekly results captured in the portal's TT Tracker reach the website as a pull request. The portal never writes to either website directly.
+
+1. In the portal, open the week's sheet at `/time-trials`. Once it is **Approved**, choose **Send results for website review**, check the preview and choose **Open review request**.
+2. The portal opens a pull request against `develop`, named `Weekly time-trial results: YYYY-MM-DD`. It must change exactly two files: the result page under `results/YYYY/` and `assets/data/results.json`.
+3. Review it: the register diff should add one entry and change the `updated` date, and nothing else. The page should use `<base href="../../">` and contain no staging hostname. Then merge it.
+4. Build a staging package from `develop` and upload it. Run `.\scripts\check-published-drift.ps1 -Channel staging` and expect a clean result.
+5. Promote to `main` by pull request with **Create a merge commit**, following "Promote an accepted release to main". Then bring `develop` level with `main`.
+6. Build the production package, upload it to `public_html`, and run the drift check with `-Channel production`.
+
+Page filenames carry a content fingerprint, for example `2026-09-15-hermans-delight-395eba68e11313ae.html`. Re-sending a corrected sheet for the same date replaces that date's register entry rather than adding a second one.
+
+#### Guided inbox publisher for approved PDFs
 
 1. Name the approved PDF with its date first, for example `2026-08-25-tuesday-time-trial-results.pdf`.
 2. Copy it into `results-inbox/`.
@@ -940,16 +963,16 @@ If the same commit has already been packaged, the builder stops rather than over
 6. Test navigation, membership links, photo albums, current and archived results, PDF downloads, the mobile menu and a deliberately missing URL.
 7. Do not promote staging to production until the club approves the staging review.
 
-#### Confirmed staging configuration — 17 September 2026
+#### Confirmed staging configuration — 18 September 2026
 
 | Item | Confirmed value |
 |---|---|
 | Staging address | `https://staging.collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
-| Deployed source | `develop` commit `eadcf5bd55c518fd1df2d1e75348c11b82cbc703` |
-| Current deployment package | `/home/colletdr/collegians-harriers-staging-eadcf5bd.zip` |
-| Previous known-good package | `/home/colletdr/collegians-harriers-staging-6f64c1a9.zip` |
-| Secondary fallback package | `/home/colletdr/collegians-harriers-staging-95f28a4b.zip` |
+| Deployed source | `develop` commit `1232c472c98552bf2959c71bedfa17833bf107eb` |
+| Current deployment package | `/home/colletdr/collegians-harriers-staging-1232c472.zip` |
+| Previous known-good package | `/home/colletdr/collegians-harriers-staging-eadcf5bd.zip` |
+| Secondary fallback package | `/home/colletdr/collegians-harriers-staging-6f64c1a9.zip` |
 | Pre-deployment backup | `/home/colletdr/staging-predeploy-defaults-20260827.zip` |
 
 The deployment packages and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
@@ -1015,29 +1038,33 @@ Record the previous production commit before uploading so rollback remains possi
 7. Open `deployment-manifest.json` on the live site and confirm its channel is `production` and its commit matches the approved package.
 8. Verify the live site: navigation, membership links, photographs, current and archived results, PDF downloads, the mobile menu, a deliberately missing URL, and the `http` to `https` redirect.
 
-#### Confirmed production configuration — 17 September 2026
+#### Confirmed production configuration — 18 September 2026
 
 | Item | Confirmed value |
 |---|---|
 | Live address | `https://collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/public_html/` |
-| Deployed source | `main` commit `eadcf5bd55c518fd1df2d1e75348c11b82cbc703` |
-| Current deployment package | `/home/colletdr/collegians-harriers-production-eadcf5bd.zip` |
-| Pre-deployment backup | `/home/colletdr/public_html_17_09_2026.zip` |
-| Committee acceptance | Nikki Jonas and Kevin Cameron, recorded 17 September 2026 |
+| Deployed source | `main` merge commit `c52915899131c13d5b6012afdaa9103eaae2ab59`, promoting the staged `develop` commit `1232c47` |
+| Current deployment package | `/home/colletdr/collegians-harriers-production-c5291589.zip` |
+| Previous known-good package | `/home/colletdr/collegians-harriers-production-eadcf5bd.zip` (first release) |
+| Website before the first release | `/home/colletdr/public_html_17_09_2026.zip` |
+| First-release acceptance | Nikki Jonas and Kevin Cameron, recorded 17 September 2026 |
+| Latest release | 15 September 2026 time-trial results, promoted by pull request #5 |
 
 The first production release was verified against the built package: the live manifest, ten spot-checked files byte for byte, all twenty pages, the branded 404, the active security headers, and the absence of any staging hostname in published pages.
+
+The 18 September release was identical, file for file, to the package verified on staging apart from its manifest. The drift check against production was clean afterwards: 12 register entries published and tracked, with page content matching the built package.
 
 #### Production rollback procedure
 
 1. In cPanel File Manager, confirm the current folder is exactly `/home/colletdr/public_html/`.
 2. Compress the current contents into a new dated ZIP in `/home/colletdr/` before changing anything, whatever state the site is in.
 3. Move the failed release's files out of `public_html`. Do not alter the staging or portal document roots.
-4. Extract `public_html_17_09_2026.zip` to restore the previous website, or an earlier production package to return to a known-good release of the current site.
+4. Extract the previous known-good production package to return to the last release, or `public_html_17_09_2026.zip` to restore the website that preceded the first release.
 5. Confirm `index.html`, `.htaccess`, `assets/` and `results/` sit directly in the document root, with hidden files shown.
 6. Retest the Home page, results, photographs, downloads, the mobile menu and a deliberately missing URL.
 
-`public_html_17_09_2026.zip` is the only copy of the website that preceded this release. Keep it until the club is satisfied the new site is correct.
+`public_html_17_09_2026.zip` is the only copy of the website that preceded the first release. Keep it until the club is satisfied the new site is correct. Keep at least the current and previous production packages in `/home/colletdr/`, so every release has a one-step rollback.
 
 ---
 
@@ -1148,6 +1175,13 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.5.0 — 18 September 2026
+
+- Documented publishing weekly time trials from the portal through a review request, staging and production.
+- Recorded the first portal-published release and the current staging and production packages.
+- Made the previous production package the standard rollback, and kept the pre-launch backup for restoring the previous website.
+- Advanced the build to Production v1.0.1.
 
 ### 1.4.0 — 17 September 2026
 
