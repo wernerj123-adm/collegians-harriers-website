@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.5.0 |
-| Website build phase | Production v1.0.1 |
-| Last updated | 18 September 2026 |
+| Handbook version | 1.6.0 |
+| Website build phase | Production v1.1.0 |
+| Last updated | 26 September 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -392,6 +392,13 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Promoted it to `main` by pull request #5 with a merge commit, and deployed a production package identical to the staged site apart from its manifest.
 5. Confirmed a clean drift check against production and verified the page, the results register, the `www` redirect and the security headers on the live site.
 
+### Phase 1.1.0 — Deployment without cPanel uploads
+
+1. Added a workflow that deploys staging on every push to `develop`, using the existing package builder and drift check.
+2. Added the same for the live site on a merged release, with an extra check that refuses to upload content staging is not already serving.
+3. Gave each site its own FTP account limited to its document root, with passwords held as repository secrets and FTPS with strict certificate checking.
+4. Released the 22 September results, the 2026 office-bearers, the club rules page and its documents this way: the first release the live site deployed itself.
+
 ### Build milestone ledger
 
 This table links the principal completed changes to their recoverable Git history. Smaller supporting commits remain available in the complete repository history.
@@ -418,6 +425,9 @@ This table links the principal completed changes to their recoverable Git histor
 | `eadcf5b` | Tracked the 1 and 8 September time-trial result pages and corrected their base path |
 | `1232c47` | Merged the first portal-published week, 15 September 2026 |
 | `c529158` | Promoted the 15 September results to `main` for the live site |
+| `bd7ce0c` | Deployed staging automatically from `develop` |
+| `2fdf3ec` | Deployed the live site automatically from a merged release |
+| `80a75ed4` | First release deployed without a cPanel upload |
 
 ---
 
@@ -691,9 +701,9 @@ Weekly results captured in the portal's TT Tracker reach the website as a pull r
 1. In the portal, open the week's sheet at `/time-trials`. Once it is **Approved**, choose **Send results for website review**, check the preview and choose **Open review request**.
 2. The portal opens a pull request against `develop`, named `Weekly time-trial results: YYYY-MM-DD`. It must change exactly two files: the result page under `results/YYYY/` and `assets/data/results.json`.
 3. Review it: the register diff should add one entry and change the `updated` date, and nothing else. The page should use `<base href="../../">` and contain no staging hostname. Then merge it.
-4. Build a staging package from `develop` and upload it. Run `.\scripts\check-published-drift.ps1 -Channel staging` and expect a clean result.
-5. Promote to `main` by pull request with **Create a merge commit**, following "Promote an accepted release to main". Then bring `develop` level with `main`.
-6. Build the production package, upload it to `public_html`, and run the drift check with `-Channel production`.
+4. Merging it deploys staging automatically and runs the drift check. Check the new page and the results hub on staging.
+5. Promote to `main` by pull request with **Create a merge commit**, following "Promote an accepted release to main". Merging deploys the live site automatically, refusing to upload unless staging is serving the same content, and runs the drift check again.
+6. Bring `develop` level with `main` after the release, and check the new page on the live site.
 
 Page filenames carry a content fingerprint, for example `2026-09-15-hermans-delight-395eba68e11313ae.html`. Re-sending a corrected sheet for the same date replaces that date's register entry rather than adding a second one.
 
@@ -933,9 +943,32 @@ assets/css/example.css?v=20260826b
 5. The source 404 page uses the GitHub Pages project base `/collegians-harriers-website/`. The deployment package builder changes it to `/` inside the cPanel package; do not edit the source page for this purpose.
 6. Do not redirect every missing address automatically; visitors should be told that the requested page was not found.
 
-### 5.13 Build and upload a cPanel package
+### 5.13 Deployment
 
-The builder prepares a reviewable upload package. It does not sign in to cPanel, transmit files or change the live website.
+Both websites deploy themselves from the repository. Nothing is uploaded to cPanel in a normal release.
+
+| Site | Deploys when | Workflow |
+|---|---|---|
+| Staging | anything is pushed to `develop`, including a merged portal review request | `.github/workflows/deploy-staging.yml` |
+| Live | a release is merged into `main` | `.github/workflows/deploy-production.yml` |
+
+Each run builds the package with the same builder and checks described below, uploads only the files that changed over FTPS, and then runs the drift check against the site it just deployed. A failing check fails the run, and the Actions tab records what every release changed.
+
+Changes to `docs/` or to Markdown files alone do not trigger a deployment.
+
+Three things guard the live site:
+
+1. `main` is protected, so only a reviewed pull request can trigger a production deployment.
+2. Production refuses to upload unless staging is serving the same content as the release, so nothing reaches the public site that was not checked on staging first.
+3. Neither workflow can deploy without its credentials. Without them a run still builds and validates the package, and says it did not upload.
+
+Each site has its own FTP account, limited to that site's document root: `stagingdeploy` for staging and `productiondeploy` for the live site. Their passwords are GitHub repository secrets (`STAGING_FTP_*` and `PRODUCTION_FTP_*`), which cannot be read back out of GitHub. Uploads use FTPS with strict certificate checking against `eivor.aserv.co.za`. The upload tool records what it has deployed in `.ftp-deploy-sync-state.json` in the site root; `production.htaccess` answers requests for that file with 404.
+
+Watch a deployment on the repository's **Actions** tab. A green tick means the site was updated and matches the repository.
+
+### 5.14 Build and upload a cPanel package by hand
+
+This is the fallback, for when automatic deployment is unavailable or a specific package must be placed by hand. The builder prepares a reviewable upload package. It does not sign in to cPanel, transmit files or change the live website.
 
 #### Build a staging package
 
@@ -963,21 +996,25 @@ If the same commit has already been packaged, the builder stops rather than over
 6. Test navigation, membership links, photo albums, current and archived results, PDF downloads, the mobile menu and a deliberately missing URL.
 7. Do not promote staging to production until the club approves the staging review.
 
-#### Confirmed staging configuration — 18 September 2026
+#### Confirmed staging configuration — 26 September 2026
 
 | Item | Confirmed value |
 |---|---|
 | Staging address | `https://staging.collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/staging.collegiansharriers.co.za/` |
-| Deployed source | `develop` commit `1232c472c98552bf2959c71bedfa17833bf107eb` |
-| Current deployment package | `/home/colletdr/collegians-harriers-staging-1232c472.zip` |
-| Previous known-good package | `/home/colletdr/collegians-harriers-staging-eadcf5bd.zip` |
-| Secondary fallback package | `/home/colletdr/collegians-harriers-staging-6f64c1a9.zip` |
+| Deployed source | whatever `develop` points at; deployed automatically |
+| Upload account | `stagingdeploy@collegiansharriers.co.za`, rooted at the staging document root |
+| Last package placed by hand | `/home/colletdr/collegians-harriers-staging-1232c472.zip` (18 September) |
+| Earlier fallback packages | `collegians-harriers-staging-eadcf5bd.zip`, `collegians-harriers-staging-6f64c1a9.zip` |
 | Pre-deployment backup | `/home/colletdr/staging-predeploy-defaults-20260827.zip` |
 
 The deployment packages and backup are deliberately stored in `/home/colletdr/`, outside the public staging document root. No hosting credentials are stored in the repository or this handbook.
 
-#### Staging rollback procedure
+#### Staging rollback
+
+Reverse the change on `develop` and let staging redeploy. Use the manual steps below only when automatic deployment is unavailable.
+
+#### Manual staging restore
 
 1. In cPanel File Manager, confirm that the current folder is exactly `/home/colletdr/staging.collegiansharriers.co.za/`.
 2. Before changing the deployed site, compress its current contents into a new dated ZIP stored in `/home/colletdr/`.
@@ -992,9 +1029,9 @@ Never store cPanel passwords, SFTP credentials or private keys in this repositor
 
 #### Check a published site for drift
 
-The portal publishes some pages by writing them straight into a document root, so a live site can hold content the repository has never seen. A deployment package replaces the result register and the whole `results/` tree, so anything published that way is removed the next time a package is extracted.
+Both deployment workflows run this check automatically after every deployment, and a failed check fails the run. Run it by hand when checking a site independently, after a manual upload, or when anything may have been changed on a server directly.
 
-Run this before building any release package:
+It exists because a served site can hold content the repository has never seen. The portal used to write weekly results straight into the staging document root, and three pages published that way were nearly lost in the first production release. The portal now opens a review request instead, but a deployment still replaces the result register and the whole `results/` tree, so anything edited on a server rather than in the repository disappears at the next release.
 
 ```powershell
 .\scripts\check-published-drift.ps1 -Channel staging
@@ -1004,7 +1041,7 @@ It reads the site's deployment manifest and result register, compares them with 
 
 Page content is compared only when the built package for the deployed commit is still in `dist\`. Published pages are not identical to their sources, because the builder rewrites the 404 base path and archive references while packaging.
 
-Bring anything it reports into the repository before releasing. Pages published by the portal carry generated filenames, so copy the published file rather than trying to reproduce its name, and add its register entry to match what the site already serves.
+Bring anything it reports into the repository before releasing. Pages carrying generated filenames should be copied as they are rather than renamed, with a register entry matching what the site already serves.
 
 #### Promote an accepted release to main
 
@@ -1038,24 +1075,32 @@ Record the previous production commit before uploading so rollback remains possi
 7. Open `deployment-manifest.json` on the live site and confirm its channel is `production` and its commit matches the approved package.
 8. Verify the live site: navigation, membership links, photographs, current and archived results, PDF downloads, the mobile menu, a deliberately missing URL, and the `http` to `https` redirect.
 
-#### Confirmed production configuration — 18 September 2026
+#### Confirmed production configuration — 26 September 2026
 
 | Item | Confirmed value |
 |---|---|
 | Live address | `https://collegiansharriers.co.za/` |
 | cPanel document root | `/home/colletdr/public_html/` |
-| Deployed source | `main` merge commit `c52915899131c13d5b6012afdaa9103eaae2ab59`, promoting the staged `develop` commit `1232c47` |
-| Current deployment package | `/home/colletdr/collegians-harriers-production-c5291589.zip` |
-| Previous known-good package | `/home/colletdr/collegians-harriers-production-eadcf5bd.zip` (first release) |
+| Deployed source | whatever `main` points at; deployed automatically when a release is merged |
+| Upload account | `productiondeploy@collegiansharriers.co.za`, rooted at `/home/colletdr/public_html` |
+| Last package placed by hand | `/home/colletdr/collegians-harriers-production-c5291589.zip` (18 September) |
 | Website before the first release | `/home/colletdr/public_html_17_09_2026.zip` |
 | First-release acceptance | Nikki Jonas and Kevin Cameron, recorded 17 September 2026 |
-| Latest release | 15 September 2026 time-trial results, promoted by pull request #5 |
+| Latest release | `80a75ed4`, 26 September 2026, pull request #7: the 22 September results, the 2026 office-bearers, the club rules page and its documents |
 
 The first production release was verified against the built package: the live manifest, ten spot-checked files byte for byte, all twenty pages, the branded 404, the active security headers, and the absence of any staging hostname in published pages.
 
 The 18 September release was identical, file for file, to the package verified on staging apart from its manifest. The drift check against production was clean afterwards: 12 register entries published and tracked, with page content matching the built package.
 
-#### Production rollback procedure
+The 26 September release was the first the live site deployed itself. The run confirmed staging was serving the same content, uploaded 336 files, and passed the drift check; a separate check from the maintainer's PC agreed.
+
+#### Production rollback
+
+The quickest correction is to reverse the change in the repository: revert the commit on `develop`, check the result on staging, then merge a release into `main`. The live site follows within minutes and stays in step with the repository, which a hand-placed package does not.
+
+Use the manual restore below when the site must be corrected immediately, when automatic deployment is unavailable, or when the repository itself is not the problem. After any manual restore, bring the repository back in line and redeploy, or the next release will undo the restore.
+
+#### Manual production restore
 
 1. In cPanel File Manager, confirm the current folder is exactly `/home/colletdr/public_html/`.
 2. Compress the current contents into a new dated ZIP in `/home/colletdr/` before changing anything, whatever state the site is in.
@@ -1175,6 +1220,14 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.6.0 — 26 September 2026
+
+- Rewrote deployment around the two workflows: staging on every push to `develop`, the live site on a merged release.
+- Kept the cPanel package steps as section 5.14, the fallback for when automatic deployment is unavailable.
+- Made reverting in the repository the first rollback route, with the manual restore kept for emergencies.
+- Recorded the 26 September release and the upload accounts for both sites.
+- Advanced the build to Production v1.1.0.
 
 ### 1.5.0 — 18 September 2026
 
