@@ -1,0 +1,97 @@
+# Builds the production package from main and uploads it to the live website.
+#
+# Runs when a release is merged into main, which is the moment the change goes
+# public. main is protected, so only a reviewed pull request can trigger this.
+# It uses the same package builder and checks as a manual release, uploads only
+# files that changed, then runs the drift check against the live site.
+#
+# Needs two repository secrets for an FTP account whose home directory is the
+# production document root, /home/colletdr/public_html:
+#   PRODUCTION_FTP_USERNAME and PRODUCTION_FTP_PASSWORD
+# Until both exist, the package is still built and checked, but not uploaded,
+# and the release is deployed by hand as before.
+
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'List what would be uploaded without changing the live site'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # The package builder uses Windows paths, as it does on the maintainer's PC.
+    runs-on: windows-latest
+    env:
+      CONNECTED: ${{ secrets.PRODUCTION_FTP_USERNAME != '' && secrets.PRODUCTION_FTP_PASSWORD != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Enough history to find the commit staging is serving.
+          fetch-depth: 50
+
+      - name: Build and validate the production package
+        id: build
+        shell: pwsh
+        run: |
+          .\scripts\build-deployment-package.ps1 -Channel production
+          $commit = (git rev-parse --short=8 HEAD).Trim()
+          "site=dist/production-$commit/site/" >> $env:GITHUB_OUTPUT
+
+      # The live site must never be given a package that staging has not served.
+      # Staging deploys from develop, so a release promoted by merge commit has
+      # the same content; this checks that rather than assuming it.
+      - name: Check the same content is live on staging
+        shell: pwsh
+        run: |
+          $manifest = Invoke-RestMethod -Uri 'https://staging.collegiansharriers.co.za/deployment-manifest.json' -Headers @{ 'Cache-Control' = 'no-cache' }
+          $staged = $manifest.sourceCommit
+          git cat-file -e "$staged^{commit}" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            throw "The commit staging serves ($($staged.Substring(0,8))) is not in the fetched history, so this release cannot be compared with it. Check staging by hand before releasing."
+          }
+          if ((git rev-parse "HEAD^{tree}") -ne (git rev-parse "$staged^{tree}")) {
+            throw "Staging serves $($staged.Substring(0,8)), whose content differs from this release. Deploy it to staging and check it before releasing."
+          }
+          Write-Host "Staging serves $($staged.Substring(0,8)), the same content as this release."
+
+      - name: Upload changed files to the live site
+        if: env.CONNECTED == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: eivor.aserv.co.za
+          port: 21
+          protocol: ftps
+          # The server's certificate is valid for this host name, so insist on it.
+          security: strict
+          username: ${{ secrets.PRODUCTION_FTP_USERNAME }}
+          password: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
+          local-dir: ${{ steps.build.outputs.site }}
+          server-dir: ./
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+
+      - name: Confirm the live site matches Git
+        if: env.CONNECTED == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.dry-run)
+        shell: pwsh
+        run: .\scripts\check-published-drift.ps1 -Channel production
+
+      - name: Note that uploading is not connected yet
+        if: env.CONNECTED != 'true'
+        shell: pwsh
+        run: |
+          "::notice::Package built and validated. Not uploaded: add the PRODUCTION_FTP_USERNAME and PRODUCTION_FTP_PASSWORD secrets to connect the live site. Upload dist/ by hand until then."
