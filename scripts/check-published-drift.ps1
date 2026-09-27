@@ -3,7 +3,9 @@ param(
     [ValidateSet('staging', 'production')]
     [string]$Channel = 'staging',
     [string]$Site,
-    [string]$Ref = 'HEAD'
+    # Defaults to the branch the chosen site tracks, not the branch you happen
+    # to have checked out: staging follows develop, the live site follows main.
+    [string]$Ref
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,6 +18,17 @@ $defaultSites = @{
 }
 if ([string]::IsNullOrWhiteSpace($Site)) { $Site = $defaultSites[$Channel] }
 $Site = $Site.TrimEnd('/')
+
+if ([string]::IsNullOrWhiteSpace($Ref)) {
+    $branch = if ($Channel -eq 'production') { 'main' } else { 'develop' }
+    Push-Location $repositoryRoot
+    try {
+        # Prefer the fetched remote branch: a stale local copy would compare
+        # the site against work that was never pushed.
+        & git rev-parse --verify --quiet "origin/$branch" > $null
+        $Ref = if ($LASTEXITCODE -eq 0) { "origin/$branch" } else { $branch }
+    } finally { Pop-Location }
+}
 
 function Get-Text {
     param(

@@ -1037,7 +1037,9 @@ It exists because a served site can hold content the repository has never seen. 
 .\scripts\check-published-drift.ps1 -Channel staging
 ```
 
-It reads the site's deployment manifest and result register, compares them with the committed register at `HEAD`, and reports pages that are published but untracked, tracked but unpublished, or served with content that differs from the built package. Pass `-Channel production` for the live site, `-Ref <commit>` to compare against a specific commit, and `-Site <url>` for an address other than the two confirmed ones. It exits non-zero when it finds drift, so it can gate a release.
+It reads the site's deployment manifest and result register, compares them with the committed register, and reports pages that are published but untracked, tracked but unpublished, or served with content that differs from the built package. It exits non-zero when it finds drift, so it can gate a release.
+
+Each site is compared against the branch it tracks, not the branch you have checked out: `-Channel staging` against `origin/develop` and `-Channel production` against `origin/main`. Pass `-Ref <commit>` to compare against something else, and `-Site <url>` for an address other than the two confirmed ones. The workflows pass `-Ref HEAD`, so each run checks the commit it just deployed.
 
 Page content is compared only when the built package for the deployed commit is still in `dist\`. Published pages are not identical to their sources, because the builder rewrites the 404 base path and archive references while packaging. Without that package it compares the registers only and says so.
 
@@ -1226,6 +1228,7 @@ These are planned items, not completed features.
 ### 1.6.1 — 27 September 2026
 
 - The drift check no longer reports a site as behind when the only newer commits are documentation, and compares registers cleanly when the built package is not on disk.
+- It now compares each site against the branch that site tracks, rather than the branch that happens to be checked out.
 
 ### 1.6.0 — 26 September 2026
 

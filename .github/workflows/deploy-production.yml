@@ -88,7 +88,8 @@ jobs:
       - name: Confirm the live site matches Git
         if: env.CONNECTED == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.dry-run)
         shell: pwsh
-        run: .\scripts\check-published-drift.ps1 -Channel production
+        # -Ref HEAD: check the commit this run deployed, not whatever the branch points at now.
+        run: .\scripts\check-published-drift.ps1 -Channel production -Ref HEAD
 
       - name: Note that uploading is not connected yet
         if: env.CONNECTED != 'true'
