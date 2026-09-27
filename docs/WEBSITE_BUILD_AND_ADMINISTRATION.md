@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.6.0 |
+| Handbook version | 1.6.1 |
 | Website build phase | Production v1.1.0 |
-| Last updated | 26 September 2026 |
+| Last updated | 27 September 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -1039,7 +1039,9 @@ It exists because a served site can hold content the repository has never seen. 
 
 It reads the site's deployment manifest and result register, compares them with the committed register at `HEAD`, and reports pages that are published but untracked, tracked but unpublished, or served with content that differs from the built package. Pass `-Channel production` for the live site, `-Ref <commit>` to compare against a specific commit, and `-Site <url>` for an address other than the two confirmed ones. It exits non-zero when it finds drift, so it can gate a release.
 
-Page content is compared only when the built package for the deployed commit is still in `dist\`. Published pages are not identical to their sources, because the builder rewrites the 404 base path and archive references while packaging.
+Page content is compared only when the built package for the deployed commit is still in `dist\`. Published pages are not identical to their sources, because the builder rewrites the 404 base path and archive references while packaging. Without that package it compares the registers only and says so.
+
+A site is not reported as behind when the newer commits changed only documentation, since neither workflow deploys `docs/` or Markdown. A handbook-only release therefore leaves both sites where they were, correctly.
 
 Bring anything it reports into the repository before releasing. Pages carrying generated filenames should be copied as they are rather than renamed, with a register entry matching what the site already serves.
 
@@ -1220,6 +1222,10 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.6.1 — 27 September 2026
+
+- The drift check no longer reports a site as behind when the only newer commits are documentation, and compares registers cleanly when the built package is not on disk.
 
 ### 1.6.0 — 26 September 2026
 
