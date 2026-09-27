@@ -158,3 +158,9 @@
     margin-top: 8px;
   }
 }
+
+/* Summary panel entries link to the section each one names. */
+.fact-panel strong a{display:inline-flex;align-items:baseline;gap:8px}
+.fact-panel strong a:hover{color:var(--red)}
+.fact-panel strong a span{color:var(--red)}
+.fact-panel strong a:focus-visible{outline:3px solid var(--red);outline-offset:4px}
