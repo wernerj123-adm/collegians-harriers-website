@@ -262,7 +262,26 @@ $legacyHostedResults = @(
     @{ Year = 2019; File = '2019-duke-of-york-results.pdf'; Title = 'Duke of York Results - 2019'; Date = '2019-11-03' },
     @{ Year = 2017; File = '2017-longest-day-solo-results.pdf'; Title = 'The Longest Day Solo Results - 2017' },
     @{ Year = 2017; File = '2017-longest-day-team-results.pdf'; Title = 'The Longest Day Team Results - 2017' },
-    @{ Year = 2019; File = '2019-longest-day-results.pdf'; Title = 'The Longest Day Results - 2019' }
+    @{ Year = 2019; File = '2019-longest-day-results.pdf'; Title = 'The Longest Day Results - 2019' },
+    # Races the club once hosted, recovered from the 17 September 2026 backup of
+    # the previous website. Every date below is read off the scan itself; the
+    # 1994 Richmond programme states no date, so it keeps a season label. These
+    # are photographed result sheets with no text layer, so they are readable as
+    # documents but their finishers cannot be searched by name.
+    @{ Year = 1976; File = '1976-greytown-to-muden-results.pdf'; Title = 'Greytown to Muden Road Race Results - 1976'; Date = '1976-09-05' },
+    @{ Year = 1977; File = '1977-greytown-to-muden-results.pdf'; Title = 'Greytown to Muden Road Race Results - 1977'; Date = '1977-09-05' },
+    @{ Year = 1977; File = '1977-richmond-marathon-results.pdf'; Title = 'Richmond Marathon Results - 1977'; Date = '1977-03-20' },
+    @{ Year = 1978; File = '1978-richmond-marathon-results.pdf'; Title = 'Richmond Marathon Results - 1978'; Date = '1978-03-19' },
+    @{ Year = 1980; File = '1980-richmond-marathon-results.pdf'; Title = 'Richmond Marathon Results - 1980'; Date = '1980-03-16' },
+    @{ Year = 1981; File = '1981-richmond-marathon-results.pdf'; Title = 'Richmond Marathon Results - 1981'; Date = '1981-03-15' },
+    @{ Year = 1994; File = '1994-richmond-marathon-results.pdf'; Title = 'Richmond Marathon Results - 1994' },
+    @{ Year = 1977; File = '1977-arthur-newton-road-run-results.pdf'; Title = 'Arthur Newton Road Run Results - 1977'; Date = '1977-05-01' },
+    @{ Year = 1978; File = '1978-arthur-newton-road-run-results.pdf'; Title = 'Arthur Newton Road Run Results - 1978'; Date = '1978-04-30' },
+    @{ Year = 1979; File = '1979-arthur-newton-road-run-results.pdf'; Title = 'Arthur Newton Road Run Results - 1979'; Date = '1979-04-29' },
+    @{ Year = 1980; File = '1980-arthur-newton-road-run-results.pdf'; Title = 'Arthur Newton Road Run Results - 1980'; Date = '1980-04-27' },
+    @{ Year = 1981; File = '1981-arthur-newton-road-run-results.pdf'; Title = 'Arthur Newton Road Run Results - 1981'; Date = '1981-04-26' },
+    @{ Year = 1978; File = '1978-vic-clapham-100-results.pdf'; Title = 'Vic Clapham 100 Results - 1978'; Date = '1978-07-08' },
+    @{ Year = 1980; File = '1980-magic-trophy-results.pdf'; Title = 'Magic Trophy Results - 1980'; Date = '1980-01-20' }
 )
 
 foreach ($item in $legacyHostedResults) {
