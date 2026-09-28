@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.6.1 |
+| Handbook version | 1.6.2 |
 | Website build phase | Production v1.1.0 |
-| Last updated | 27 September 2026 |
+| Last updated | 28 September 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -818,8 +818,16 @@ The archive is deliberately separate from the current-results register. Current 
 
 5. The builder adds approved documents under `assets/results/archive/YYYY/` and regenerates `assets/data/results-archive.json`.
 6. It never replaces a published archive file with different content. If a correction is required, publish a clearly named revised document so the change remains visible in version control.
-7. Open `results-archive.html` and test text search, season filters, result-type filters and several PDF links before committing.
-8. Commit the archive register, new PDFs and any builder-policy change together.
+7. Always run the HTML builder next:
+
+```powershell
+py .\scripts\build-archive-html.py
+```
+
+   The PowerShell builder rewrites the register from scratch, which removes the `page` entry that points each record at its searchable HTML reading copy. Until the HTML builder has run, every archived result links to its raw PDF instead of its reading page. Confirm the register still carries as many `page` entries as there are files under `results\archive\`.
+8. Open `results-archive.html` and test text search, season filters, result-type filters and several PDF links before committing.
+9. Photographed sheets with no text layer are expected to be skipped by the HTML builder and to appear as PDF links only. Their finishers cannot be searched by name anywhere on the site, or in the portal's club history.
+10. Commit the archive register, new PDFs and any builder-policy change together. The HTML builder rewrites every reading copy with Unix line endings; if the only difference in those files is the line ending, discard them so the commit stays readable.
 
 The same register automatically feeds the public subject pages:
 
