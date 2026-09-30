@@ -3,7 +3,9 @@ param(
     [ValidateSet('staging', 'production')]
     [string]$Channel = 'staging',
     [string]$Site,
-    [string]$Ref = 'HEAD'
+    # Defaults to the branch the chosen site tracks, not the branch you happen
+    # to have checked out: staging follows develop, the live site follows main.
+    [string]$Ref
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,6 +18,17 @@ $defaultSites = @{
 }
 if ([string]::IsNullOrWhiteSpace($Site)) { $Site = $defaultSites[$Channel] }
 $Site = $Site.TrimEnd('/')
+
+if ([string]::IsNullOrWhiteSpace($Ref)) {
+    $branch = if ($Channel -eq 'production') { 'main' } else { 'develop' }
+    Push-Location $repositoryRoot
+    try {
+        # Prefer the fetched remote branch: a stale local copy would compare
+        # the site against work that was never pushed.
+        & git rev-parse --verify --quiet "origin/$branch" > $null
+        $Ref = if ($LASTEXITCODE -eq 0) { "origin/$branch" } else { $branch }
+    } finally { Pop-Location }
+}
 
 function Get-Text {
     param(
@@ -56,7 +69,8 @@ function Get-Sha256 {
 
 function Get-PackagedFile {
     param(
-        [Parameter(Mandatory)] [AllowNull()] [string]$SiteRoot,
+        # No package on disk is normal: the check then compares registers only.
+        [Parameter(Mandatory)] [AllowNull()] [AllowEmptyString()] [string]$SiteRoot,
         [Parameter(Mandatory)] [string]$Path
     )
 
@@ -93,7 +107,20 @@ if ($null -eq $manifestJson) {
     $deployed = $manifest.sourceCommit.Substring(0, 8)
     Write-Host "  Deployed package: $($manifest.channel) $deployed ($($manifest.fileCount) files)"
     if ($manifest.sourceCommit -notlike "$resolved*") {
-        $findings.Add("The deployed package was built from $deployed, not $resolved. Rebuild or promote before comparing further.")
+        # A site is not stale when the only newer commits changed things no
+        # deployment publishes. The workflows skip docs and Markdown, so a
+        # handbook-only release legitimately leaves the sites where they were.
+        Push-Location $repositoryRoot
+        try {
+            $changed = @(& git diff --name-only $manifest.sourceCommit $resolved 2>$null)
+            $comparable = $LASTEXITCODE -eq 0 -and $changed.Count -gt 0
+        } finally { Pop-Location }
+        $unpublished = $comparable -and -not ($changed | Where-Object { $_ -notmatch '^docs/' -and $_ -notmatch '\.md$' })
+        if ($unpublished) {
+            Write-Host "  Newer commits change only documentation ($($changed.Count) file(s)), which is never deployed."
+        } else {
+            $findings.Add("The deployed package was built from $deployed, not $resolved. Rebuild or promote before comparing further.")
+        }
     }
 }
 

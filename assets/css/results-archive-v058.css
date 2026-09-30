@@ -249,3 +249,10 @@
     margin-top: 6px;
   }
 }
+
+/* Page heroes that carry an action, matching the result-detail hero. */
+.page-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:end}
+.page-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+.page-hero-actions .btn.secondary{border-color:#4b4b4f;background:transparent;color:#fff}
+.page-hero-actions .btn.secondary:hover{border-color:var(--red);background:var(--red)}
+@media(max-width:700px){.page-hero-grid{grid-template-columns:minmax(0,1fr);gap:22px}}
