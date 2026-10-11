@@ -1,0 +1,92 @@
+# Opens (but never merges) the develop -> main release pull request once staging
+# has successfully deployed new content from develop. Review happens on staging
+# via the links in the PR body; merging stays a deliberate human action, since
+# that is what triggers the production deploy (see deploy-production.yml).
+
+name: Open release pull request
+
+on:
+  workflow_run:
+    workflows: ["Deploy staging"]
+    types: [completed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop'
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Check whether main is already up to date
+        id: diff
+        shell: pwsh
+        run: |
+          git fetch origin main --quiet
+          $mainTree = git rev-parse 'origin/main^{tree}'
+          $devTree = git rev-parse 'HEAD^{tree}'
+          if ($mainTree -eq $devTree) {
+            Write-Host "develop matches main already; nothing to release."
+            "skip=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "skip=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Check for an existing open release pull request
+        id: existing
+        if: steps.diff.outputs.skip == 'false'
+        shell: pwsh
+        run: |
+          $open = gh pr list --base main --head develop --state open --json number | ConvertFrom-Json
+          if ($open.Count -gt 0) {
+            Write-Host "An open release pull request already exists (#$($open[0].number)); leaving it as is."
+            "skip=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "skip=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Build the review summary and open the pull request
+        if: steps.diff.outputs.skip == 'false' && steps.existing.outputs.skip == 'false'
+        shell: pwsh
+        run: |
+          $commits = (git log --no-merges --format=%s origin/main..HEAD) -join "`n"
+          $newPages = git diff --name-only --diff-filter=A origin/main..HEAD -- 'results/**/*.html'
+
+          $lines = @(
+            "## Review on staging before merging",
+            "",
+            "- [Staging home](https://staging.collegiansharriers.co.za/)",
+            "- [Results register](https://staging.collegiansharriers.co.za/results.html)"
+          )
+          foreach ($path in $newPages) {
+            if ($path.Trim()) {
+              $url = "https://staging.collegiansharriers.co.za/" + $path.Trim().Replace('\', '/')
+              $lines += "- [New page: $($path.Trim())]($url)"
+            }
+          }
+          $lines += @(
+            "",
+            "## What's in this release",
+            '```',
+            $commits,
+            '```',
+            "",
+            "Merging this pull request releases it to the live site - the production deploy ",
+            "runs automatically on merge, checked against what staging is currently serving."
+          )
+          $body = ($lines -join "`n")
+          $body | Out-File -FilePath release-pr-body.md -Encoding utf8
+
+          $shortSha = (git rev-parse --short=8 HEAD).Trim()
+          $primarySubject = (git log --no-merges --format=%s origin/main..HEAD -1).Trim()
+          $title = if ($primarySubject) { "Release: $primarySubject" } else { "Release: staging as of $shortSha" }
+
+          gh pr create --base main --head develop --title $title --body-file release-pr-body.md
