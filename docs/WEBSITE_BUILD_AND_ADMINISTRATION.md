@@ -4,9 +4,9 @@
 
 | Record | Value |
 |---|---|
-| Handbook version | 1.6.2 |
+| Handbook version | 1.6.3 |
 | Website build phase | Production v1.1.0 |
-| Last updated | 28 September 2026 |
+| Last updated | 11 October 2026 |
 | Active development branch | `develop` |
 | Stable production branch | `main` |
 | Development preview | <https://wernerj123-adm.github.io/collegians-harriers-website/> |
@@ -974,6 +974,8 @@ Each site has its own FTP account, limited to that site's document root: `stagin
 
 Watch a deployment on the repository's **Actions** tab. A green tick means the site was updated and matches the repository.
 
+**If a run fails on "Confirm staging matches Git" (or the equivalent live-site step), but the earlier "Upload changed files" step shows green:** the upload itself worked — the file was just not readable yet at the moment the check fetched it a few seconds later, and the server returned an error page instead of the deployment manifest. This is a timing race, not a real problem with the release. Open the run and re-run only the failed job (the **Re-run jobs → Re-run failed jobs** button on the run page, or `gh run rerun <run-id> --failed`); it passes once the file has settled, usually within a minute. Do not treat this as a reason to upload by hand or skip the check — confirm it actually passes on the re-run before trusting the release.
+
 ### 5.14 Build and upload a cPanel package by hand
 
 This is the fallback, for when automatic deployment is unavailable or a specific package must be placed by hand. The builder prepares a reviewable upload package. It does not sign in to cPanel, transmit files or change the live website.
@@ -1232,6 +1234,11 @@ These are planned items, not completed features.
 ---
 
 ## 11. Handbook change log
+
+### 1.6.3 — 11 October 2026
+
+- Documented the staging drift-check timing race: a failure on "Confirm staging matches Git" right after a green "Upload changed files" step is a false alarm, not a real problem — re-run the failed job.
+- Added a workflow that opens (never merges) the `develop` → `main` release pull request automatically once staging redeploys successfully, with direct staging review links in the PR body. Merging to go live stays a deliberate human step. Because GitHub only evaluates `workflow_run` triggers from the file on the default branch, the workflow could not open its own first release and was opened by hand that one time; it has opened every release since.
 
 ### 1.6.1 — 27 September 2026
 
