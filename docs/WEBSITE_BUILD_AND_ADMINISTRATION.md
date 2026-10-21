@@ -156,7 +156,7 @@ External links should open in a new tab and use `rel="noopener noreferrer"`.
 4. Added the family discount note and Tuesday Time Trial collection footnote.
 5. Built the dedicated Longest Day 2026 page.
 6. Added the club crest as a subtle watermark across the site.
-7. Corrected the club founding statement to “Established in 1934 in Pietermaritzburg”.
+7. Corrected the club founding statement to “Established in 1934 in Pietermaritzburg”. Changed to 1933 on 21 October 2026: the club archive dates the founding meeting of the Maritzburg Harriers Athletic Club to 24 January 1933, and the name Collegians Harriers to 24 January 1950.
 
 ### Phase 0.4 — Accessibility and browser polish
 
