@@ -182,13 +182,7 @@ function Optimize-ResultArchivePackage {
         if ([string]::IsNullOrWhiteSpace($record.page) -or [string]::IsNullOrWhiteSpace($record.file)) { continue }
         $htmlPages++
         $localReference = $record.file.Replace('\', '/').TrimStart('/')
-        $localPdf = Join-Path $SiteRoot $localReference.Replace('/', '\')
         $record.file = $githubBase + $localReference
-        if ($directPdfReferences.Contains($localReference) -or -not (Test-Path -LiteralPath $localPdf -PathType Leaf)) { continue }
-        $pdfInfo = Get-Item -LiteralPath $localPdf
-        $omittedPdfBytes += $pdfInfo.Length
-        Remove-Item -LiteralPath $localPdf -Force
-        $omittedPdfs++
     }
     Write-Utf8Text -Path $registerPath -Value (($register | ConvertTo-Json -Depth 8) + "`n")
 
@@ -202,6 +196,17 @@ function Optimize-ResultArchivePackage {
             $record.file = $githubBase + $localReference
         }
         Write-Utf8Text -Path $currentRegisterPath -Value (($currentRegister | ConvertTo-Json -Depth 8) + "`n")
+    }
+
+    $archiveRoot = Join-Path $SiteRoot 'assets\results\archive'
+    if (Test-Path -LiteralPath $archiveRoot -PathType Container) {
+        foreach ($pdf in Get-ChildItem -LiteralPath $archiveRoot -Filter '*.pdf' -File -Recurse) {
+            $relative = (Get-RelativePath -BasePath $SiteRoot -TargetPath $pdf.FullName).Replace('\', '/')
+            if ($directPdfReferences.Contains($relative)) { continue }
+            $omittedPdfBytes += $pdf.Length
+            Remove-Item -LiteralPath $pdf.FullName -Force
+            $omittedPdfs++
+        }
     }
 
     return [pscustomobject]@{ HtmlPages = $htmlPages; OmittedPdfs = $omittedPdfs; OmittedPdfBytes = $omittedPdfBytes }
