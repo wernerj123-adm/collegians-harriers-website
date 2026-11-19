@@ -960,7 +960,7 @@ Both websites deploy themselves from the repository. Nothing is uploaded to cPan
 | Staging | anything is pushed to `develop`, including a merged portal review request | `.github/workflows/deploy-staging.yml` |
 | Live | a release is merged into `main` | `.github/workflows/deploy-production.yml` |
 
-Each run builds the package with the same builder and checks described below, uploads only the files that changed over FTPS, and then runs the drift check against the site it just deployed. A failing check fails the run, and the Actions tab records what every release changed.
+Each run builds the package with the same builder and checks described below, uploads it over FTPS, and then runs the drift check against the site it just deployed. Staging uploads only changed files. Production first clears its dedicated document root so the uploader can make room for the compact package even when the hosting account is full. A failing check fails the run, and the Actions tab records what every release changed.
 
 Changes to `docs/` or to Markdown files alone do not trigger a deployment.
 

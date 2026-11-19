@@ -3,7 +3,8 @@
 # Runs when a release is merged into main, which is the moment the change goes
 # public. main is protected, so only a reviewed pull request can trigger this.
 # It uses the same package builder and checks as a manual release, uploads only
-# files that changed, then runs the drift check against the live site.
+# files in a clean production document root, then runs the drift check against
+# the live site.
 #
 # Needs two repository secrets for an FTP account whose home directory is the
 # production document root, /home/colletdr/public_html:
@@ -83,6 +84,9 @@ jobs:
           password: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
           local-dir: ${{ steps.build.outputs.site }}
           server-dir: ./
+          # The uploader applies deletions after uploads. Clear the dedicated
+          # document root first so a full server can accept the smaller package.
+          dangerous-clean-slate: true
           dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
 
       - name: Confirm the live site matches Git
