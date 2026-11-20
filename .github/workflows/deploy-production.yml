@@ -5,7 +5,7 @@
 # It uses the same package builder and checks as a manual release, uploads only
 # files that changed, then runs the drift check against the live site.
 #
-# Uploads over SSH (rsync) when the DEPLOY_SSH_KEY secret exists: the private
+# Uploads over SSH (scripts/ssh-upload.sh) when the DEPLOY_SSH_KEY secret exists: the private
 # half of a key authorised for the cPanel account under SSH Access. Optional:
 #   DEPLOY_SSH_KNOWN_HOSTS  the server's host key line, to pin it
 #   vars.DEPLOY_SSH_PORT    the SSH port, when it is not Afrihost's 24
@@ -94,7 +94,7 @@ jobs:
 
   upload:
     needs: build
-    # rsync and OpenSSH come with the Linux runner.
+    # OpenSSH and GNU tar come with the Linux runner.
     runs-on: ubuntu-latest
     outputs:
       uploaded: ${{ steps.mode.outputs.uploaded }}
@@ -120,29 +120,20 @@ jobs:
           name: production-site
           path: site
 
+      # Only the upload script is needed from the repository.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.mode.outputs.mode == 'ssh'
+        with:
+          path: repo
+          sparse-checkout: scripts/ssh-upload.sh
+          sparse-checkout-cone-mode: false
+
       - name: Upload changed files to the live site over SSH
         id: ssh
         if: steps.mode.outputs.mode == 'ssh'
-        # Falls back to FTPS below if the account has no shell for rsync.
+        # Falls back to FTPS below if the SSH upload fails.
         continue-on-error: true
-        run: |
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          if [ -n "$SSH_KNOWN_HOSTS" ]; then
-            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          else
-            ssh-keyscan -p "$SSH_PORT" -t ed25519,rsa "$SSH_HOST" 2>/dev/null | grep -v '^#' > ~/.ssh/known_hosts
-            echo "::warning::Host key not pinned. Save this as the DEPLOY_SSH_KNOWN_HOSTS secret: $(head -n1 ~/.ssh/known_hosts)"
-          fi
-          flags=(--recursive --checksum --compress --itemize-changes --chmod=D755,F644)
-          if [ "$DRY_RUN" = true ]; then flags+=(--dry-run); fi
-          # No --delete: the document root also holds files the package does
-          # not own (.well-known, .user.ini). Retired files are removed by hand.
-          rsync "${flags[@]}" \
-            -e "ssh -p $SSH_PORT -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
-            site/ "$SSH_USER@$SSH_HOST:$SSH_TARGET"
-          rm -f ~/.ssh/deploy_key
+        run: bash repo/scripts/ssh-upload.sh
 
       - name: Upload changed files to the live site over FTPS
         if: steps.mode.outputs.mode == 'ftp' || (steps.ssh.outcome == 'failure' && env.FTP_CONNECTED == 'true')
