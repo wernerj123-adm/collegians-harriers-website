@@ -6,10 +6,13 @@
 # the live staging site. Nothing reaches the public site from here: production
 # still needs a reviewed pull request into main.
 #
-# Needs two repository secrets for an FTP account whose home directory is the
-# staging document root, /home/colletdr/staging.collegiansharriers.co.za:
+# Uploads over SSH (rsync) when the DEPLOY_SSH_KEY secret exists, exactly as
+# deploy-production.yml does; see there for the optional host key and port.
+# Without the key it falls back to FTPS, which needs an FTP account whose home
+# directory is the staging document root,
+# /home/colletdr/staging.collegiansharriers.co.za:
 #   STAGING_FTP_USERNAME and STAGING_FTP_PASSWORD
-# Until both exist, the package is still built and checked, but not uploaded.
+# With neither, the package is still built and checked, but not uploaded.
 
 name: Deploy staging
 
@@ -33,12 +36,18 @@ concurrency:
   group: deploy-staging
   cancel-in-progress: false
 
+env:
+  SSH_HOST: eivor.aserv.co.za
+  SSH_USER: colletdr
+  SSH_TARGET: /home/colletdr/staging.collegiansharriers.co.za/
+  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+
 jobs:
-  deploy:
+  build:
     # The package builder uses Windows paths, as it does on the maintainer's PC.
     runs-on: windows-latest
-    env:
-      CONNECTED: ${{ secrets.STAGING_FTP_USERNAME != '' && secrets.STAGING_FTP_PASSWORD != '' }}
+    outputs:
+      commit: ${{ steps.build.outputs.commit }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -48,10 +57,69 @@ jobs:
         run: |
           .\scripts\build-deployment-package.ps1 -Channel staging
           $commit = (git rev-parse --short=8 HEAD).Trim()
+          "commit=$commit" >> $env:GITHUB_OUTPUT
           "site=dist/staging-$commit/site/" >> $env:GITHUB_OUTPUT
 
-      - name: Upload changed files to staging
-        if: env.CONNECTED == 'true'
+      - name: Keep the package for the upload
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: staging-site
+          path: ${{ steps.build.outputs.site }}
+          # .htaccess must travel with the site.
+          include-hidden-files: true
+          retention-days: 7
+
+  upload:
+    needs: build
+    # rsync and OpenSSH come with the Linux runner.
+    runs-on: ubuntu-latest
+    outputs:
+      uploaded: ${{ steps.mode.outputs.uploaded }}
+    env:
+      SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+      SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '24' }}
+      FTP_CONNECTED: ${{ secrets.STAGING_FTP_USERNAME != '' && secrets.STAGING_FTP_PASSWORD != '' }}
+    steps:
+      - name: Choose how to upload
+        id: mode
+        run: |
+          if [ -n "$SSH_KEY" ]; then mode=ssh
+          elif [ "$FTP_CONNECTED" = true ]; then mode=ftp
+          else mode=none; fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          if [ "$mode" != none ] && [ "$DRY_RUN" != true ]; then echo "uploaded=true" >> "$GITHUB_OUTPUT"; fi
+          echo "Uploading with: $mode"
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: steps.mode.outputs.mode != 'none'
+        with:
+          name: staging-site
+          path: site
+
+      - name: Upload changed files to staging over SSH
+        if: steps.mode.outputs.mode == 'ssh'
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "$SSH_PORT" -t ed25519,rsa "$SSH_HOST" > ~/.ssh/known_hosts
+            echo "::warning::Host key not pinned. Save this as the DEPLOY_SSH_KNOWN_HOSTS secret: $(head -n1 ~/.ssh/known_hosts)"
+          fi
+          flags=(--recursive --checksum --compress --itemize-changes --chmod=D755,F644)
+          if [ "$DRY_RUN" = true ]; then flags+=(--dry-run); fi
+          # No --delete: the document root also holds files the package does
+          # not own (.well-known, .user.ini). Retired files are removed by hand.
+          rsync "${flags[@]}" \
+            -e "ssh -p $SSH_PORT -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            site/ "$SSH_USER@$SSH_HOST:$SSH_TARGET"
+          rm -f ~/.ssh/deploy_key
+
+      - name: Upload changed files to staging over FTPS
+        if: steps.mode.outputs.mode == 'ftp'
         uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
         with:
           server: eivor.aserv.co.za
@@ -61,18 +129,29 @@ jobs:
           security: strict
           username: ${{ secrets.STAGING_FTP_USERNAME }}
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
-          local-dir: ${{ steps.build.outputs.site }}
+          local-dir: site/
           server-dir: ./
-          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+          dry-run: ${{ env.DRY_RUN }}
+
+      - name: Note that uploading is not connected yet
+        if: steps.mode.outputs.mode == 'none'
+        run: |
+          echo "::notice::Package built and validated. Not uploaded: add the DEPLOY_SSH_KEY secret (or the STAGING_FTP_* secrets) to connect staging."
+
+  verify:
+    needs: [build, upload]
+    if: needs.upload.outputs.uploaded == 'true'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The drift check compares result pages with the package it finds in dist/.
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: staging-site
+          path: dist/staging-${{ needs.build.outputs.commit }}/site
 
       - name: Confirm staging matches Git
-        if: env.CONNECTED == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.dry-run)
         shell: pwsh
         # -Ref HEAD: check the commit this run deployed, not whatever the branch points at now.
         run: .\scripts\check-published-drift.ps1 -Channel staging -Ref HEAD
-
-      - name: Note that uploading is not connected yet
-        if: env.CONNECTED != 'true'
-        shell: pwsh
-        run: |
-          "::notice::Package built and validated. Not uploaded: add the STAGING_FTP_USERNAME and STAGING_FTP_PASSWORD secrets to connect staging."
