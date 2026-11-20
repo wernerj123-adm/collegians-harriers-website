@@ -960,7 +960,7 @@ Both websites deploy themselves from the repository. Nothing is uploaded to cPan
 | Staging | anything is pushed to `develop`, including a merged portal review request | `.github/workflows/deploy-staging.yml` |
 | Live | a release is merged into `main` | `.github/workflows/deploy-production.yml` |
 
-Each run builds the package with the same builder and checks described below, uploads only the files that changed over FTPS, and then runs the drift check against the site it just deployed. A failing check fails the run, and the Actions tab records what every release changed.
+Each run builds the package with the same builder and checks described below, uploads only the files that changed, and then runs the drift check against the site it just deployed. A failing check fails the run, and the Actions tab records what every release changed.
 
 Changes to `docs/` or to Markdown files alone do not trigger a deployment.
 
@@ -970,7 +970,9 @@ Three things guard the live site:
 2. Production refuses to upload unless staging is serving the same content as the release, so nothing reaches the public site that was not checked on staging first.
 3. Neither workflow can deploy without its credentials. Without them a run still builds and validates the package, and says it did not upload.
 
-Each site has its own FTP account, limited to that site's document root: `stagingdeploy` for staging and `productiondeploy` for the live site. Their passwords are GitHub repository secrets (`STAGING_FTP_*` and `PRODUCTION_FTP_*`), which cannot be read back out of GitHub. Uploads use FTPS with strict certificate checking against `eivor.aserv.co.za`. The upload tool records what it has deployed in `.ftp-deploy-sync-state.json` in the site root; `production.htaccess` answers requests for that file with 404.
+Uploads go over SSH, through `scripts/ssh-upload.sh`, when the `DEPLOY_SSH_KEY` repository secret exists. It holds the private half of a key authorised for the cPanel account under **SSH Access**; the workflows sign in as `colletdr` to `eivor.aserv.co.za` and write to `public_html` (live) or `staging.collegiansharriers.co.za` (staging). The optional `DEPLOY_SSH_KNOWN_HOSTS` secret pins the server's host key, and the repository variable `DEPLOY_SSH_PORT` sets the port when it is not 24, the port Afrihost uses for this account. The account has a jailed shell without rsync, so the script compares MD5 hashes with the server and sends only the changed files through `tar`, then checks the hashes again; it never deletes files on the server, so remove a retired page by hand. This key reaches the whole hosting account, not one site, so keep it only in GitHub and remove it under SSH Access if it is ever exposed.
+
+Without the SSH key, each workflow falls back to FTPS with its own FTP account, limited to that site's document root: `stagingdeploy` for staging and `productiondeploy` for the live site. Their passwords are GitHub repository secrets (`STAGING_FTP_*` and `PRODUCTION_FTP_*`), which cannot be read back out of GitHub. Uploads use FTPS with strict certificate checking against `eivor.aserv.co.za`. The FTP upload tool records what it has deployed in `.ftp-deploy-sync-state.json` in the site root; `production.htaccess` answers requests for that file with 404. Afrihost's FTP server refuses uploads with `552 Disk full - please upload later` whenever the shared server disk is nearly full, even when the account has room (seen 19 and 20 November 2026), which is why SSH is preferred.
 
 Watch a deployment on the repository's **Actions** tab. A green tick means the site was updated and matches the repository.
 
