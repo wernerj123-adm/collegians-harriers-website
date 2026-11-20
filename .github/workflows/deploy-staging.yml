@@ -78,7 +78,7 @@ jobs:
     env:
       SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
-      SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+      SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '24' }}
       FTP_CONNECTED: ${{ secrets.STAGING_FTP_USERNAME != '' && secrets.STAGING_FTP_PASSWORD != '' }}
     steps:
       - name: Choose how to upload

@@ -8,7 +8,7 @@
 # Uploads over SSH (rsync) when the DEPLOY_SSH_KEY secret exists: the private
 # half of a key authorised for the cPanel account under SSH Access. Optional:
 #   DEPLOY_SSH_KNOWN_HOSTS  the server's host key line, to pin it
-#   vars.DEPLOY_SSH_PORT    the SSH port, when it is not 22
+#   vars.DEPLOY_SSH_PORT    the SSH port, when it is not Afrihost's 24
 # Without the key it falls back to FTPS, which needs an FTP account whose home
 # directory is the production document root, /home/colletdr/public_html:
 #   PRODUCTION_FTP_USERNAME and PRODUCTION_FTP_PASSWORD
@@ -101,7 +101,7 @@ jobs:
     env:
       SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
-      SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+      SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '24' }}
       FTP_CONNECTED: ${{ secrets.PRODUCTION_FTP_USERNAME != '' && secrets.PRODUCTION_FTP_PASSWORD != '' }}
     steps:
       - name: Choose how to upload
