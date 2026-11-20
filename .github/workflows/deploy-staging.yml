@@ -98,7 +98,10 @@ jobs:
           path: site
 
       - name: Upload changed files to staging over SSH
+        id: ssh
         if: steps.mode.outputs.mode == 'ssh'
+        # Falls back to FTPS below if the account has no shell for rsync.
+        continue-on-error: true
         run: |
           install -d -m 700 ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
@@ -106,7 +109,7 @@ jobs:
           if [ -n "$SSH_KNOWN_HOSTS" ]; then
             printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           else
-            ssh-keyscan -p "$SSH_PORT" -t ed25519,rsa "$SSH_HOST" > ~/.ssh/known_hosts
+            ssh-keyscan -p "$SSH_PORT" -t ed25519,rsa "$SSH_HOST" 2>/dev/null | grep -v '^#' > ~/.ssh/known_hosts
             echo "::warning::Host key not pinned. Save this as the DEPLOY_SSH_KNOWN_HOSTS secret: $(head -n1 ~/.ssh/known_hosts)"
           fi
           flags=(--recursive --checksum --compress --itemize-changes --chmod=D755,F644)
@@ -119,7 +122,7 @@ jobs:
           rm -f ~/.ssh/deploy_key
 
       - name: Upload changed files to staging over FTPS
-        if: steps.mode.outputs.mode == 'ftp'
+        if: steps.mode.outputs.mode == 'ftp' || (steps.ssh.outcome == 'failure' && env.FTP_CONNECTED == 'true')
         uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
         with:
           server: eivor.aserv.co.za
@@ -132,6 +135,12 @@ jobs:
           local-dir: site/
           server-dir: ./
           dry-run: ${{ env.DRY_RUN }}
+
+      - name: Stop when SSH failed and there is no FTPS to fall back on
+        if: steps.ssh.outcome == 'failure' && env.FTP_CONNECTED != 'true'
+        run: |
+          echo "::error::The SSH upload failed and no FTP secrets are set to fall back on."
+          exit 1
 
       - name: Note that uploading is not connected yet
         if: steps.mode.outputs.mode == 'none'
