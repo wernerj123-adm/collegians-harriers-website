@@ -32,7 +32,44 @@
     return years;
   }
 
+  // Age on 31 December of the membership year decides the category (the portal checks the same rule).
+  function ageAtYearEnd(dob) {
+    if (!dob) return null;
+    const born = new Date(dob + 'T00:00:00');
+    return YEAR - born.getFullYear();
+  }
+
+  // A 13-digit SA ID number starts with the date of birth (YYMMDD): fill the birth date when it is empty.
+  function dobFromId(block) {
+    const id = block.querySelector('[data-f=id_number]').value.replace(/\s/g, '');
+    const field = block.querySelector('[data-f=date_of_birth]');
+    if (field.value || !/^\d{13}$/.test(id)) return;
+    const yy = Number(id.slice(0, 2)), mm = id.slice(2, 4), dd = id.slice(4, 6);
+    const year = (yy > new Date().getFullYear() % 100 ? 1900 : 2000) + yy;
+    const iso = year + '-' + mm + '-' + dd;
+    if (!Number.isNaN(new Date(iso + 'T00:00:00').getTime())) field.value = iso;
+  }
+
+  function checkCategory(block) {
+    const select = block.querySelector('[data-f=category]');
+    const note = block.querySelector('[data-category-note]');
+    const category = options.categories.find(c => c.name === select.value);
+    const years = ageAtYearEnd(block.querySelector('[data-f=date_of_birth]').value);
+    let message = '';
+    if (category && years !== null && category.min_age != null && (years < category.min_age || years > category.max_age)) {
+      const fits = options.categories.filter(c => c.min_age != null && c.name !== 'Student' && years >= c.min_age && years <= c.max_age).map(c => c.name);
+      message = category.name + ' is not available: this member will be ' + years + ' on 31 December ' + YEAR + '.'
+        + (fits.length ? ' Choose ' + fits.join(' or ') + '.' : '');
+    }
+    select.setCustomValidity(message);
+    note.textContent = message;
+    note.hidden = !message;
+    return !message;
+  }
+
   function refresh(block) {
+    dobFromId(block);
+    checkCategory(block);
     const kind = (block.querySelector('[data-f=member_kind]:checked') || {}).value;
     const years = age(block.querySelector('[data-f=date_of_birth]').value);
     block.querySelector('[data-show=renewing]').hidden = kind !== 'renewing';
@@ -96,6 +133,7 @@
 
   async function quote() {
     const data = body();
+    if (![...people.children].every(checkCategory)) { quoteBox.innerHTML = '<p class="join-error">Fix the category above to see the amount.</p>'; return; }
     if (!data.people.every(ready)) { quoteBox.innerHTML = '<p class="join-small">Fill in the members above to see the amount.</p>'; return; }
     const current = ++quoteVersion;
     try {
