@@ -1,0 +1,33 @@
+.join-wrap [hidden]{display:none!important}
+.join-wrap{max-width:900px}
+.join-panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;margin:0 0 20px;min-width:0}
+.join-panel legend{font-weight:900;font-size:1.1rem;padding:0 6px}
+.join-panel h2{margin-top:0;line-height:1.15}
+.join-intro p{color:var(--muted);max-width:720px}
+.join-small{color:var(--muted);font-size:.88rem}
+.join-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;margin:14px 0}
+.join-grid[hidden],[data-show][hidden]{display:none}
+.join-panel label{display:flex;flex-direction:column;gap:5px;font-weight:750;font-size:.9rem}
+.join-panel label small{font-weight:500;color:var(--muted)}
+.join-panel input:not([type=checkbox]):not([type=radio]),.join-panel select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
+.join-panel input:focus,.join-panel select:focus{outline:2px solid var(--red);outline-offset:1px}
+label.join-choice{flex-direction:row;align-items:flex-start;gap:10px;font-weight:500;margin:10px 0}
+.join-choice input{margin-top:5px;accent-color:var(--red);width:18px;height:18px;flex:none}
+.join-kind{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.join-kind .join-choice{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0}
+.join-person{position:relative}
+.join-remove{position:absolute;top:16px;right:18px;background:none;border:0;color:var(--red-dark);font-weight:800;cursor:pointer}
+#add-person{margin:0 0 20px}
+.join-hp{position:absolute!important;left:-10000px;width:1px;height:1px;overflow:hidden}
+.join-quote{width:100%;border-collapse:collapse}
+.join-quote td{padding:6px 0;border-bottom:1px solid var(--line)}
+.join-quote td:last-child{text-align:right;white-space:nowrap}
+.join-quote-person h3{margin:14px 0 4px;font-size:1rem}
+.join-total{font-size:1.3rem;text-align:right;margin:14px 0 0}
+.join-total strong{color:var(--red)}
+.join-consent{margin:0 0 18px!important}
+.join-error{color:var(--red-dark);font-weight:800}
+.join-submit{font-size:1.05rem;padding:14px 30px;display:flex;margin-top:8px}
+.join-submit:disabled{opacity:.6}
+.join-bank{list-style:none;padding:14px 18px;background:var(--cream);border-radius:12px;font-weight:750}
+@media(max-width:760px){.join-grid,.join-kind{grid-template-columns:1fr}.join-panel{padding:20px 16px}}
