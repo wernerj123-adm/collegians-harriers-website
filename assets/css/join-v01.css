@@ -32,3 +32,4 @@ label.join-choice{flex-direction:row;align-items:flex-start;gap:10px;font-weight
 .join-bank{list-style:none;padding:14px 18px;background:var(--cream);border-radius:12px;font-weight:750}
 @media(max-width:760px){.join-grid,.join-kind{grid-template-columns:1fr}.join-panel{padding:20px 16px}}
 .join-span{grid-column:1/-1;margin:0}
+.join-off{opacity:.45}

@@ -76,12 +76,26 @@
     block.querySelector('[data-show=joining]').hidden = !(kind === 'new' || kind === 'returning');
     block.querySelector('[data-show=minor]').hidden = !(years !== null && years < 18);
     const minor = years !== null && years < 18;
+    const section = block.querySelector('[data-f=other_section]').checked;
+    block.querySelector('[data-show=section]').hidden = !section;
+    block.querySelector('[data-f=other_section_name]').required = section;
+    updateRoutes();
     block.querySelector('[data-show=adult]').hidden = minor;
     for (const key of ['emergency_name', 'emergency_phone', 'email', 'phone']) block.querySelector('[data-f=' + key + ']').required = !minor;
     for (const key of ['guardian_name', 'guardian_phone', 'guardian_email']) block.querySelector('[data-f=' + key + ']').required = minor;
     block.querySelectorAll('[data-own-contact]').forEach(star => { star.textContent = minor ? '(if they have one)' : '*'; });
     const kit = block.querySelector('[data-f=kit_choice]').value;
     block.querySelector('[data-f=kit_size]').disabled = !kit;
+  }
+
+  // A subsection claim waits for the committee, so it cannot be paid online straight away.
+  function updateRoutes() {
+    const claim = [...people.querySelectorAll('[data-f=other_section]')].some(box => box.checked);
+    const card = document.querySelector('#route-card-wrap input');
+    if (!options || !options.card_payments) return;
+    card.disabled = claim;
+    document.getElementById('route-card-wrap').classList.toggle('join-off', claim);
+    if (claim && card.checked) card.checked = false;
   }
 
   function addPerson() {
@@ -112,7 +126,7 @@
     const value = key => block.querySelector('[data-f=' + key + ']');
     const person = {member_kind: (block.querySelector('[data-f=member_kind]:checked') || {}).value || ''};
     for (const key of ['first_name', 'last_name', 'date_of_birth', 'gender', 'id_number', 'category', 'email', 'phone', 'emergency_name',
-      'emergency_phone', 'previous_asa_number', 'previous_club', 'kit_choice', 'kit_size', 'guardian_name', 'guardian_phone', 'guardian_email']) {
+      'emergency_phone', 'previous_asa_number', 'previous_club', 'kit_choice', 'kit_size', 'guardian_name', 'guardian_phone', 'guardian_email', 'other_section_name']) {
       const field = value(key);
       if (field.closest('[hidden]')) continue;
       if (field.value.trim()) person[key] = field.value.trim();
@@ -163,7 +177,8 @@
   function showResult(result, route) {
     const box = document.getElementById('join-result');
     let html = '<span class="section-kicker">REFERENCE ' + esc(result.reference) + '</span><h2>';
-    if (result.status === 'paid') html += 'You are signed up.</h2><p>Nothing was due, so your membership is confirmed. Welcome to Collegians.</p>';
+    if (result.committee_check) html += 'Thank you. The committee will confirm your subsection membership.</h2><p>Please wait before paying: the club will contact you with the amount due (' + rand(result.total_cents) + ' if confirmed). Then pay by ' + (route === 'bar' ? 'card or cash at the club bar' : 'EFT') + ', quoting <strong>' + esc(result.reference) + '</strong>.</p>' + (route === 'eft' ? eftPanel(result) : '');
+    else if (result.status === 'paid') html += 'You are signed up.</h2><p>Nothing was due, so your membership is confirmed. Welcome to Collegians.</p>';
     else if (route === 'eft') html += 'Thank you. Now pay ' + rand(result.total_cents) + ' by EFT.</h2>' + eftPanel(result);
     else if (route === 'bar') html += 'Thank you. Pay ' + rand(result.total_cents) + ' at the club bar.</h2><p>Pay by card or cash at the Collegians Club bar and quote <strong>' + esc(result.reference) + '</strong>. Your membership starts once you have paid.</p>';
     else html += 'Your signup is saved.</h2><p>' + esc(result.card_error || 'The card payment could not start.') + ' You can pay ' + rand(result.total_cents) + ' by EFT instead.</p>' + eftPanel(result);
