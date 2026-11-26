@@ -75,6 +75,11 @@
     block.querySelector('[data-show=renewing]').hidden = kind !== 'renewing';
     block.querySelector('[data-show=joining]').hidden = !(kind === 'new' || kind === 'returning');
     block.querySelector('[data-show=minor]').hidden = !(years !== null && years < 18);
+    const minor = years !== null && years < 18;
+    block.querySelector('[data-show=adult]').hidden = minor;
+    for (const key of ['emergency_name', 'emergency_phone', 'email', 'phone']) block.querySelector('[data-f=' + key + ']').required = !minor;
+    for (const key of ['guardian_name', 'guardian_phone', 'guardian_email']) block.querySelector('[data-f=' + key + ']').required = minor;
+    block.querySelectorAll('[data-own-contact]').forEach(star => { star.textContent = minor ? '(if they have one)' : '*'; });
     const kit = block.querySelector('[data-f=kit_choice]').value;
     block.querySelector('[data-f=kit_size]').disabled = !kit;
   }
@@ -89,7 +94,7 @@
     block.querySelector('[data-f=kit_size]').innerHTML = '<option value="">Size</option>' + options.kit_sizes.map(s => '<option>' + esc(s) + '</option>').join('');
     if (n > 1) {
       const first = people.firstElementChild;
-      for (const key of ['last_name', 'emergency_name', 'emergency_phone']) block.querySelector('[data-f=' + key + ']').value = first.querySelector('[data-f=' + key + ']').value;
+      for (const key of ['last_name', 'emergency_name', 'emergency_phone', 'guardian_name', 'guardian_phone', 'guardian_email']) block.querySelector('[data-f=' + key + ']').value = first.querySelector('[data-f=' + key + ']').value;
     }
     people.appendChild(block);
     renumber(); refresh(block);
@@ -123,7 +128,8 @@
   }
 
   function ready(person) {
-    return person.first_name && person.last_name && person.date_of_birth && person.gender && person.category && person.member_kind && person.emergency_name && person.emergency_phone;
+    const contact = (person.emergency_name && person.emergency_phone) || (person.guardian_name && person.guardian_phone);
+    return person.first_name && person.last_name && person.date_of_birth && person.gender && person.category && person.member_kind && contact;
   }
 
   function scheduleQuote() {
