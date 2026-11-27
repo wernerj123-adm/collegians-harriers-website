@@ -35,3 +35,7 @@ label.join-choice{flex-direction:row;align-items:flex-start;gap:10px;font-weight
 .join-off{opacity:.45}
 .page-hero .section-kicker{font-size:clamp(1rem,1.6vw,1.35rem);letter-spacing:.16em}
 .page-hero .section-kicker:before{width:56px;height:4px}
+.join-panel legend,.join-panel h2{font-size:clamp(1.35rem,2.2vw,1.75rem);font-weight:900;letter-spacing:-.01em}
+.join-wrap .section-kicker{font-size:clamp(1rem,1.6vw,1.35rem);letter-spacing:.16em}
+.join-wrap .section-kicker:before{width:56px;height:4px}
+.join-quote-person h3{font-size:1.15rem}
