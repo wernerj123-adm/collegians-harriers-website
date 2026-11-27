@@ -139,6 +139,7 @@
     person.needs_licence = value('needs_licence').checked;
     person.card_lost = !value('card_lost').closest('[hidden]') && value('card_lost').checked;
     person.age_tags = !value('age_tags').closest('[hidden]') && value('age_tags').checked;
+    if (block.dataset.renewal) person.renewal_token = block.dataset.renewal;
     return person;
   }
 
@@ -265,5 +266,41 @@
     }
     addPerson();
     form.hidden = false;
+    const renew = new URLSearchParams(location.search).get('renew');
+    if (renew) await useRenewalLink(renew);
   })();
+
+  // A member's personal renewal link (?renew=...): their details come pre-filled and the signup is tied to their record.
+  async function useRenewalLink(token) {
+    const note = document.createElement('p');
+    note.className = 'join-renewal';
+    form.querySelector('.join-intro').appendChild(note);
+    let data;
+    try { data = await api('/public/renewal/' + encodeURIComponent(token)); }
+    catch (error) { note.textContent = 'This renewal link is not valid or has expired. Please fill in the form below, or ask the club for a new link.'; return; }
+    if (data.year !== YEAR) { note.textContent = 'This renewal link is for ' + data.year + '. Please sign up below.'; return; }
+    if (data.renewed) {
+      note.innerHTML = '<b>' + esc(data.first_name) + ', your ' + YEAR + ' membership is already paid.</b> Thank you. You can still use this form to sign up family members.';
+      return;
+    }
+    const block = people.firstElementChild;
+    const field = key => block.querySelector('[data-f=' + key + ']');
+    block.dataset.renewal = token;
+    const renewing = block.querySelector('[data-f=member_kind][value=renewing]');
+    renewing.checked = true;
+    block.querySelectorAll('[data-f=member_kind]').forEach(input => { if (input !== renewing) input.disabled = true; });
+    for (const key of ['first_name', 'last_name', 'date_of_birth', 'email', 'phone']) if (data[key]) field(key).value = data[key];
+    if (data.previous_asa_number) field('previous_asa_number').value = data.previous_asa_number;
+    if (['Male', 'Female', 'Other'].includes(data.gender)) field('gender').value = data.gender;
+    const category = data.previous_category && options.categories.find(c => c.name.toLowerCase() === String(data.previous_category).toLowerCase());
+    if (category) field('category').value = category.name;
+    if (data.id_on_file) {
+      field('id_number').placeholder = 'On file with the club';
+      field('id_number').nextElementSibling.textContent = 'Leave empty to keep the number the club has on file';
+    }
+    if (data.email && !form.elements.contact_email.value) form.elements.contact_email.value = data.email;
+    if (data.phone && form.elements.contact_phone && !form.elements.contact_phone.value) form.elements.contact_phone.value = data.phone;
+    note.innerHTML = '<b>Welcome back, ' + esc(data.first_name) + '.</b> Your details from last year are filled in below. Please check them, update anything that has changed, and choose how you will pay.';
+    refresh(block); checkCategory(block); scheduleQuote();
+  }
 })();
