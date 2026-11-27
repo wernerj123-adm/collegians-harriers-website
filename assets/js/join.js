@@ -84,6 +84,10 @@
     for (const key of ['emergency_name', 'emergency_phone', 'email', 'phone']) block.querySelector('[data-f=' + key + ']').required = !minor;
     for (const key of ['guardian_name', 'guardian_phone', 'guardian_email']) block.querySelector('[data-f=' + key + ']').required = minor;
     block.querySelectorAll('[data-own-contact]').forEach(star => { star.textContent = minor ? '(if they have one)' : '*'; });
+    const chosen = options.categories.find(c => c.name === block.querySelector('[data-f=category]').value);
+    const tags = chosen ? chosen.tags_cents : null;
+    block.querySelector('[data-show=tags]').hidden = !tags;
+    block.querySelector('[data-tags-price]').textContent = tags ? '(R' + (tags / 100).toFixed(tags % 100 ? 2 : 0) + ')' : '';
     const kit = block.querySelector('[data-f=kit_choice]').value;
     block.querySelector('[data-f=kit_size]').disabled = !kit;
   }
@@ -134,6 +138,7 @@
     person.other_section = value('other_section').checked;
     person.needs_licence = value('needs_licence').checked;
     person.card_lost = !value('card_lost').closest('[hidden]') && value('card_lost').checked;
+    person.age_tags = !value('age_tags').closest('[hidden]') && value('age_tags').checked;
     return person;
   }
 
