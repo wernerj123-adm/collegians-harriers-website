@@ -30,6 +30,16 @@ remote() {
     -o StrictHostKeyChecking=yes -o BatchMode=yes "$SSH_USER@$SSH_HOST" "$@"
 }
 
+# The host sometimes times out for a while; wait and try again before giving up.
+for wait in 15 45 90 0; do
+  if remote true; then break; fi
+  if [ "$wait" -eq 0 ]; then
+    echo "::error::Could not sign in to $SSH_HOST on port $SSH_PORT. If it timed out, re-run the failed jobs."
+    exit 1
+  fi
+  echo "SSH sign-in failed; trying again in ${wait}s."
+  sleep "$wait"
+done
 remote "command -v tar >/dev/null && command -v md5sum >/dev/null && cd '$SSH_TARGET'" \
   || { echo "::error::The server shell lacks tar or md5sum, or $SSH_TARGET is missing."; exit 1; }
 
