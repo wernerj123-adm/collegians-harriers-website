@@ -5,7 +5,11 @@ param(
     [string]$Site,
     # Defaults to the branch the chosen site tracks, not the branch you happen
     # to have checked out: staging follows develop, the live site follows main.
-    [string]$Ref
+    [string]$Ref,
+    # A folder holding copies of the published files, fetched over SSH by the
+    # deploy workflows. When given, files are read from it instead of over the
+    # web, where the host's bot check turns automated requests away.
+    [string]$PublishedRoot
 )
 
 $ErrorActionPreference = 'Stop'
@@ -18,6 +22,9 @@ $defaultSites = @{
 }
 if ([string]::IsNullOrWhiteSpace($Site)) { $Site = $defaultSites[$Channel] }
 $Site = $Site.TrimEnd('/')
+if (-not [string]::IsNullOrWhiteSpace($PublishedRoot)) {
+    $PublishedRoot = (Resolve-Path -LiteralPath $PublishedRoot).Path
+}
 
 if ([string]::IsNullOrWhiteSpace($Ref)) {
     $branch = if ($Channel -eq 'production') { 'main' } else { 'develop' }
@@ -35,6 +42,14 @@ function Get-Text {
         [Parameter(Mandatory)] [string]$Url,
         [switch]$MissingOk
     )
+
+    if (-not [string]::IsNullOrWhiteSpace($PublishedRoot)) {
+        $relative = ([Uri]$Url).AbsolutePath.TrimStart('/') -replace '/', [IO.Path]::DirectorySeparatorChar
+        $file = Join-Path $PublishedRoot ([Uri]::UnescapeDataString($relative))
+        if (Test-Path -LiteralPath $file -PathType Leaf) { return [IO.File]::ReadAllText($file) }
+        if ($MissingOk) { return $null }
+        throw "Could not read $Url (not found on the server)"
+    }
 
     # The host sometimes answers automated requests with a web page (a bot
     # check or an error page) instead of the file. For JSON, which can never
@@ -108,6 +123,7 @@ try {
 } finally { Pop-Location }
 
 Write-Host "Checking $Site against $Ref ($resolved)."
+if ($PublishedRoot) { Write-Host "  Reading the published files fetched over SSH into $PublishedRoot." }
 Write-Host ''
 
 $findings = New-Object System.Collections.Generic.List[string]
