@@ -179,6 +179,24 @@
     return lines + '<p>Use <strong>' + esc(result.reference) + '</strong> as the payment reference. Your membership starts once the club sees the payment.</p>';
   }
 
+  function payCardButton() {
+    return '<p><button type="button" class="btn" data-pay-card>Pay by card now</button> <span class="join-small">on Yoco\'s secure card page</span></p><p class="join-error" data-pay-error hidden></p>';
+  }
+
+  async function payByCard(result, button) {
+    const error = button.closest('#join-result, #done').querySelector('[data-pay-error]');
+    button.disabled = true; button.textContent = 'Opening Yoco…'; error.hidden = true;
+    try {
+      const response = await fetch(API + '/public/pay-card/' + encodeURIComponent(result.reference), {method: 'POST',
+        headers: {'Content-Type': 'application/json'}, body: JSON.stringify({t: result.status_token || ''})});
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.redirect_url) throw new Error(data.message || data.error || 'The card payment could not start. Try again, or pay by EFT.');
+      location.href = data.redirect_url;
+    } catch (e) {
+      error.textContent = e.message; error.hidden = false; button.disabled = false; button.textContent = 'Pay by card now';
+    }
+  }
+
   function showResult(result, route) {
     const box = document.getElementById('join-result');
     let html = '<span class="section-kicker">REFERENCE ' + esc(result.reference) + '</span><h2>';
@@ -187,8 +205,12 @@
     else if (route === 'eft') html += 'Thank you. Now pay ' + rand(result.total_cents) + ' by EFT.</h2>' + eftPanel(result);
     else if (route === 'bar') html += 'Thank you. Pay ' + rand(result.total_cents) + ' at the club bar.</h2><p>Pay by card or cash at the Collegians Club bar and quote <strong>' + esc(result.reference) + '</strong>. Your membership starts once you have paid.</p>';
     else html += 'Your signup is saved.</h2><p>' + esc(result.card_error || 'The card payment could not start.') + ' You can pay ' + rand(result.total_cents) + ' by EFT instead.</p>' + eftPanel(result);
+    // EFT or bar chosen, or the card did not start: they can still pay by card now (when card payments are on).
+    if (!result.committee_check && result.status !== 'paid' && options.card_payments) html += payCardButton();
     html += '<p class="join-small">Keep this reference. Questions: collegians.harriers@outlook.com</p>';
     box.innerHTML = html;
+    const pay = box.querySelector('[data-pay-card]');
+    if (pay) pay.addEventListener('click', () => payByCard(result, pay));
     form.hidden = true; box.hidden = false;
     box.scrollIntoView({behavior: 'smooth', block: 'start'});
   }
