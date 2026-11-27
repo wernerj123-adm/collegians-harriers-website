@@ -13,7 +13,10 @@ const menuButton=document.querySelector('.menu-btn');const nav=document.querySel
   if (!allowed) return;
 
   const repo = 'wernerj123-adm/collegians-harriers-website';
-  const compare = `https://github.com/${repo}/compare/main...develop?expand=1`;
+  // The release pull request is opened automatically once staging has
+  // deployed. Until it is found, point at the list of open releases rather
+  // than GitHub's blank "open a pull request" form.
+  const releases = `https://github.com/${repo}/pulls?q=is%3Apr+is%3Aopen+base%3Amain`;
 
   const bar = document.createElement('div');
   bar.setAttribute('role', 'complementary');
@@ -28,7 +31,7 @@ const menuButton=document.querySelector('.menu-btn');const nav=document.querySel
       'line-height:1;cursor:pointer;padding:0 2px">&times;</button>' +
     '</div>' +
     '<p data-state style="margin:8px 0 12px;color:#ddd">This is not the public site.</p>' +
-    `<a href="${compare}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d71920;` +
+    `<a data-release href="${releases}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d71920;` +
     'color:#fff;font-weight:800;text-decoration:none;border-radius:999px;padding:9px 16px">Review and release to live &rarr;</a>';
 
   const state = bar.querySelector('[data-state]');
@@ -39,6 +42,13 @@ const menuButton=document.querySelector('.menu-btn');const nav=document.querySel
 
   try { if (sessionStorage.getItem('release-bar-hidden')) return; } catch {}
   document.body.appendChild(bar);
+
+  // Link straight to the open release pull request. Best effort, like below.
+  const owner = repo.split('/')[0];
+  fetch(`https://api.github.com/repos/${repo}/pulls?state=open&base=main&head=${owner}:develop`, {cache: 'no-store'})
+    .then(response => response.ok ? response.json() : Promise.reject(new Error(String(response.status))))
+    .then(pulls => { if (pulls.length) bar.querySelector('[data-release]').href = pulls[0].html_url; })
+    .catch(() => {});
 
   // How far ahead of live staging is. Best effort: the public API is rate
   // limited per address, so a failure leaves the button working and silent.
