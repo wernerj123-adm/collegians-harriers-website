@@ -36,13 +36,26 @@ function Get-Text {
         [switch]$MissingOk
     )
 
-    try {
-        return (Invoke-WebRequest -Uri $Url -UseBasicParsing -Headers @{ 'Cache-Control' = 'no-cache' }).Content
-    } catch {
-        $status = $null
-        if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
-        if ($MissingOk -and $status -eq 404) { return $null }
-        throw "Could not read $Url ($($_.Exception.Message))"
+    # The host sometimes answers automated requests with a web page (a bot
+    # check or an error page) instead of the file. For JSON, which can never
+    # start with '<', wait and ask again before failing.
+    $isJson = $Url -match '\.json$'
+    foreach ($wait in 10, 30, 60, 0) {
+        try {
+            $content = (Invoke-WebRequest -Uri $Url -UseBasicParsing -Headers @{ 'Cache-Control' = 'no-cache' }).Content
+        } catch {
+            $status = $null
+            if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
+            if ($MissingOk -and $status -eq 404) { return $null }
+            throw "Could not read $Url ($($_.Exception.Message))"
+        }
+        if (-not $isJson -or -not "$content".TrimStart().StartsWith('<')) { return $content }
+        if ($wait -eq 0) {
+            $text = ("$content" -replace '<[^>]+>', ' ' -replace '\s+', ' ').Trim()
+            throw "$Url returned a web page instead of JSON, so the host is blocking this check. It said: $($text.Substring(0, [Math]::Min(300, $text.Length)))"
+        }
+        Write-Host "  $Url returned a web page instead of JSON; trying again in $wait s."
+        Start-Sleep -Seconds $wait
     }
 }
 
