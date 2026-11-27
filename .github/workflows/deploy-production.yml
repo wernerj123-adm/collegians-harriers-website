@@ -98,6 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       uploaded: ${{ steps.mode.outputs.uploaded }}
+      fetched: ${{ steps.fetch.outcome == 'success' }}
     env:
       SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
@@ -120,12 +121,14 @@ jobs:
           name: production-site
           path: site
 
-      # Only the upload script is needed from the repository.
+      # Only the SSH scripts are needed from the repository.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: steps.mode.outputs.mode == 'ssh'
         with:
           path: repo
-          sparse-checkout: scripts/ssh-upload.sh
+          sparse-checkout: |
+            scripts/ssh-upload.sh
+            scripts/ssh-fetch.sh
           sparse-checkout-cone-mode: false
 
       - name: Upload changed files to the live site over SSH
@@ -156,6 +159,22 @@ jobs:
           echo "::error::The SSH upload failed and no FTP secrets are set to fall back on."
           exit 1
 
+      # Copy the server's versions of the package's files for the drift check,
+      # which cannot read the site over the web past the host's bot check.
+      - name: Fetch the published files over SSH
+        id: fetch
+        if: steps.mode.outputs.uploaded == 'true' && env.SSH_KEY != ''
+        continue-on-error: true
+        run: bash repo/scripts/ssh-fetch.sh site published
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: steps.fetch.outcome == 'success'
+        with:
+          name: published-files
+          path: published/
+          include-hidden-files: true
+          retention-days: 7
+
       - name: Note that uploading is not connected yet
         if: steps.mode.outputs.mode == 'none'
         run: |
@@ -176,7 +195,17 @@ jobs:
           name: production-site
           path: dist/production-${{ needs.build.outputs.commit }}/site
 
+      # Copies of the published files, fetched over SSH by the upload job,
+      # because the host's bot check turns GitHub's machines away on the web.
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: needs.upload.outputs.fetched == 'true'
+        with:
+          name: published-files
+          path: published
+
       - name: Confirm the live site matches Git
         shell: pwsh
         # -Ref HEAD: check the commit this run deployed, not whatever the branch points at now.
-        run: .\scripts\check-published-drift.ps1 -Channel production -Ref HEAD
+        run: |
+          $root = if ('${{ needs.upload.outputs.fetched }}' -eq 'true') { @{ PublishedRoot = 'published' } } else { @{} }
+          .\scripts\check-published-drift.ps1 -Channel production -Ref HEAD @root
