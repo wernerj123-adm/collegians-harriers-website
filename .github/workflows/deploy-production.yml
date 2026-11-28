@@ -46,7 +46,43 @@ env:
   DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
 
 jobs:
+  # Reads which commit staging serves over SSH: the host's bot check answers
+  # GitHub's machines with a "One moment, please" page on the web.
+  staging:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.read.outputs.commit }}
+    env:
+      SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+      SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '24' }}
+    steps:
+      - name: Read the commit staging serves, over SSH
+        id: read
+        if: env.SSH_KEY != ''
+        run: |
+          install -d -m 700 ~/.ssh
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "$SSH_PORT" -t ed25519,rsa "$SSH_HOST" 2>/dev/null | grep -v '^#' > ~/.ssh/known_hosts || true
+          fi
+          for wait in 15 45 90 0; do
+            if json=$(ssh -p "$SSH_PORT" -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes \
+                "$SSH_USER@$SSH_HOST" "cat /home/colletdr/staging.collegiansharriers.co.za/deployment-manifest.json"); then break; fi
+            if [ "$wait" -eq 0 ]; then echo "::error::Could not read the staging manifest over SSH."; exit 1; fi
+            echo "SSH failed; trying again in ${wait}s."; sleep "$wait"
+          done
+          commit=$(jq -r .sourceCommit <<<"$json")
+          if ! [[ "$commit" =~ ^[0-9a-f]{40}$ ]]; then echo "::error::The staging manifest has no source commit."; exit 1; fi
+          echo "Staging serves ${commit:0:8}."
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: staging
     # The package builder uses Windows paths, as it does on the maintainer's PC.
     runs-on: windows-latest
     outputs:
@@ -72,8 +108,13 @@ jobs:
       - name: Check the same content is live on staging
         shell: pwsh
         run: |
-          $manifest = Invoke-RestMethod -Uri 'https://staging.collegiansharriers.co.za/deployment-manifest.json' -Headers @{ 'Cache-Control' = 'no-cache' }
-          $staged = $manifest.sourceCommit
+          $staged = '${{ needs.staging.outputs.commit }}'
+          if (-not $staged) {
+            # No deploy key: read it over the web, as before.
+            $manifest = Invoke-RestMethod -Uri 'https://staging.collegiansharriers.co.za/deployment-manifest.json' -Headers @{ 'Cache-Control' = 'no-cache' }
+            $staged = "$($manifest.sourceCommit)"
+            if ($staged -notmatch '^[0-9a-f]{40}$') { throw 'Could not read which commit staging serves (the host may have answered with a bot check page).' }
+          }
           git cat-file -e "$staged^{commit}" 2>$null
           if ($LASTEXITCODE -ne 0) {
             throw "The commit staging serves ($($staged.Substring(0,8))) is not in the fetched history, so this release cannot be compared with it. Check staging by hand before releasing."
